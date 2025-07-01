@@ -60,6 +60,26 @@
             </li>
 
             <li class="nav-item">
+              {% url 'student_view_assignments' as student_view_assignments %}
+              <a href="{{ student_view_assignments }}" class="nav-link {% if request.path == student_view_assignments %} active {% endif %}">
+                <i class="nav-icon fas fa-tasks"></i>
+                <p>
+                  View Assignments
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'student_view_fines' as student_view_fines %}
+              <a href="{{ student_view_fines }}" class="nav-link {% if request.path == student_view_fines %} active {% endif %}">
+                <i class="nav-icon fas fa-money-bill"></i>
+                <p>
+                  View & Pay Fines
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
               {% url 'student_apply_leave' as student_apply_leave %}
               <a href="{{ student_apply_leave }}" class="nav-link {% if request.path == student_apply_leave %} active {% endif %}">
                 <i class="nav-icon fas fa-envelope-open-text"></i>

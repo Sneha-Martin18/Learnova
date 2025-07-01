@@ -1,12 +1,32 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
-from django.core.files.storage import FileSystemStorage #To upload Profile Picture
+from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
-import datetime # To Parse input DateTime into Python Date Time Object
+from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
+import json
+import razorpay
+import datetime
 
-from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
-
+from student_management_app.models import (
+    Students,
+    Courses,
+    Subjects,
+    CustomUser,
+    Attendance,
+    AttendanceReport,
+    LeaveReportStudent,
+    FeedBackStudent,
+    StudentResult,
+    Assignment,
+    AssignmentSubmission,
+    Fine
+)
 
 def student_home(request):
     student_obj = Students.objects.get(admin=request.user.id)
@@ -195,6 +215,180 @@ def student_view_result(request):
     return render(request, "student_template/student_view_result.html", context)
 
 
+@login_required
+def view_assignments(request):
+    student = Students.objects.get(admin=request.user)
+    # Fix: Filter assignments based on student's course subjects
+    subjects = Subjects.objects.filter(course_id=student.course_id)
+    assignments = Assignment.objects.filter(subject_id__in=subjects)
+    
+    # Get student's submissions
+    submissions = AssignmentSubmission.objects.filter(student_id=student)
+    submissions_dict = {sub.assignment_id.id: sub for sub in submissions}
+    
+    context = {
+        'assignments': assignments,
+        'submissions': submissions_dict,
+        'now': timezone.now(),
+        'page_title': 'View Assignments'
+    }
+    return render(request, 'student_template/view_assignments.html', context)
 
 
+@login_required
+def submit_assignment(request, assignment_id):
+    if request.method != "POST":
+        messages.error(request, "Invalid Method")
+        return redirect('student_view_assignments')
+    
+    try:
+        assignment = Assignment.objects.get(id=assignment_id)
+        student = Students.objects.get(admin=request.user)
+        
+        # Check if assignment is past due date
+        if timezone.now() > assignment.due_date:
+            messages.error(request, "Assignment submission deadline has passed")
+            return redirect('student_view_assignments')
+        
+        # Check if student has already submitted
+        if AssignmentSubmission.objects.filter(student_id=student, assignment_id=assignment).exists():
+            messages.error(request, "You have already submitted this assignment")
+            return redirect('student_view_assignments')
+        
+        if 'submission_file' not in request.FILES:
+            messages.error(request, "Please select a file to submit")
+            return redirect('student_view_assignments')
+        
+        submission_file = request.FILES['submission_file']
+        fs = FileSystemStorage()
+        filename = fs.save(f'assignments/submissions/{student.id}_{assignment_id}_{submission_file.name}', submission_file)
+        
+        submission = AssignmentSubmission(
+            student_id=student,
+            assignment_id=assignment,
+            submission_file=filename
+        )
+        submission.save()
+        messages.success(request, "Assignment submitted successfully")
+        return redirect('student_view_assignments')
+    except Exception as e:
+        messages.error(request, f"Error submitting assignment: {str(e)}")
+        return redirect('student_view_assignments')
 
+
+def student_view_fines(request):
+    student = Students.objects.get(admin=request.user)
+    fines = Fine.objects.filter(student_id=student, paid=False)
+    context = {
+        "fines": fines
+    }
+    return render(request, 'student_template/student_view_fines.html', context)
+
+
+def initialize_payment(request, fine_id):
+    try:
+        fine = Fine.objects.get(id=fine_id, student_id__admin=request.user, paid=False)
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        
+        # Convert amount to paise (Razorpay expects amount in smallest currency unit)
+        amount_in_paise = int(fine.amount * 100)
+        
+        payment_data = {
+            'amount': amount_in_paise,
+            'currency': 'INR',
+            'receipt': f'fine_{fine.id}',
+            'notes': {
+                'fine_id': fine.id,
+                'student_id': fine.student_id.id,
+                'reason': fine.reason
+            }
+        }
+        
+        order = client.order.create(data=payment_data)
+        
+        context = {
+            'fine': fine,
+            'razorpay_key': settings.RAZORPAY_KEY_ID,
+            'amount_in_paise': amount_in_paise,
+            'currency': 'INR',
+            'order_id': order['id']
+        }
+        
+        return render(request, 'student_template/payment_page.html', context)
+    except Fine.DoesNotExist:
+        messages.error(request, "Fine not found or already paid")
+        return redirect('student_view_fines')
+    except Exception as e:
+        messages.error(request, f"Error initializing payment: {str(e)}")
+        return redirect('student_view_fines')
+
+
+@csrf_exempt
+def payment_callback(request):
+    try:
+        # Get payment details from request
+        payment_id = request.GET.get('razorpay_payment_id')
+        order_id = request.GET.get('razorpay_order_id')
+        signature = request.GET.get('razorpay_signature')
+        
+        # Initialize Razorpay client
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        
+        # Verify payment signature
+        params_dict = {
+            'razorpay_payment_id': payment_id,
+            'razorpay_order_id': order_id,
+            'razorpay_signature': signature
+        }
+        
+        try:
+            client.utility.verify_payment_signature(params_dict)
+            
+            # Get order details
+            order = client.order.fetch(order_id)
+            
+            # Extract fine_id from receipt
+            fine_id = int(order['receipt'].split('_')[1])
+            
+            # Update fine status
+            fine = Fine.objects.get(id=fine_id)
+            fine.paid = True
+            fine.payment_id = payment_id
+            fine.payment_date = timezone.now()
+            fine.save()
+            
+            # Try to send confirmation email
+            try:
+                subject = 'Fine Payment Confirmation'
+                message = f'''Dear {fine.student_id.admin.first_name},
+                
+Your fine payment of ₹{fine.amount} for {fine.reason} has been received.
+Payment ID: {payment_id}
+Date: {fine.payment_date}
+
+Thank you for your payment.
+
+Best regards,
+Student Management System'''
+                
+                send_mail(
+                    subject,
+                    message,
+                    settings.EMAIL_HOST_USER,
+                    [fine.student_id.admin.email],
+                    fail_silently=True,
+                )
+            except Exception as email_error:
+                # Log the email error but don't fail the payment process
+                print(f"Failed to send confirmation email: {str(email_error)}")
+            
+            messages.success(request, "Payment successful! A confirmation email has been sent.")
+            return redirect('student_view_fines')
+            
+        except Exception as e:
+            messages.error(request, f"Payment verification failed: {str(e)}")
+            return redirect('student_view_fines')
+            
+    except Exception as e:
+        messages.error(request, f"Error processing payment: {str(e)}")
+        return redirect('student_view_fines')

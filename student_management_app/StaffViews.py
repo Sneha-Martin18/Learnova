@@ -3,15 +3,25 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage #To upload Profile Picture
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.core import serializers
 import json
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.conf import settings
 
 
-from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult
+from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, Assignment, AssignmentSubmission, Fine
+from .forms import AddFineForm
 
 
 def staff_home(request):
+    try:
+        staff = Staffs.objects.get(admin=request.user)
+    except Staffs.DoesNotExist:
+        messages.error(request, "Staff profile not found. Please contact administrator.")
+        return redirect('login')
+
     # Fetching All Students under Staff
 
     subjects = Subjects.objects.filter(staff_id=request.user.id)
@@ -353,3 +363,189 @@ def staff_add_result_save(request):
         except:
             messages.error(request, "Failed to Add Result!")
             return redirect('staff_add_result')
+
+@login_required
+def manage_assignments(request):
+    staff = Staffs.objects.get(admin=request.user)
+    subjects = Subjects.objects.filter(staff_id=request.user)
+    assignments = Assignment.objects.filter(subject_id__in=subjects)
+    context = {
+        'assignments': assignments,
+        'page_title': 'Manage Assignments'
+    }
+    return render(request, 'staff_template/manage_assignments.html', context)
+
+@login_required
+def add_assignment(request):
+    subjects = Subjects.objects.filter(staff_id=request.user)
+    context = {
+        'subjects': subjects,
+        'page_title': 'Add Assignment'
+    }
+    return render(request, 'staff_template/add_assignment.html', context)
+
+@login_required
+def add_assignment_save(request):
+    if request.method != "POST":
+        messages.error(request, "Invalid Method")
+        return redirect('staff_manage_assignments')
+    else:
+        subject_id = request.POST.get('subject')
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        due_date = request.POST.get('due_date')
+
+        try:
+            subject = Subjects.objects.get(id=subject_id)
+            assignment = Assignment(
+                subject_id=subject,
+                title=title,
+                description=description,
+                due_date=due_date
+            )
+            assignment.save()
+            messages.success(request, "Assignment Added Successfully!")
+            return redirect('staff_manage_assignments')
+        except Exception as e:
+            messages.error(request, f"Could Not Add Assignment: {str(e)}")
+            return redirect('staff_add_assignment')
+
+@login_required
+def view_assignment_submissions(request, assignment_id):
+    try:
+        assignment = Assignment.objects.get(id=assignment_id)
+        submissions = AssignmentSubmission.objects.filter(assignment_id=assignment)
+        context = {
+            'assignment': assignment,
+            'submissions': submissions,
+            'page_title': f'Submissions for {assignment.title}'
+        }
+        return render(request, 'staff_template/view_assignment_submissions.html', context)
+    except Assignment.DoesNotExist:
+        messages.error(request, "Assignment Not Found")
+        return redirect('staff_manage_assignments')
+
+@login_required
+@csrf_protect
+def grade_assignment(request):
+    if request.method != "POST":
+        messages.error(request, "Invalid Method")
+        return HttpResponse("Method Not Allowed")
+    
+    try:
+        submission_id = request.POST.get('submission_id')
+        marks = request.POST.get('marks')
+        
+        if not submission_id or not marks:
+            return HttpResponse("Missing required fields")
+        
+        try:
+            marks = float(marks)
+            if marks < 0:
+                return HttpResponse("Marks cannot be negative")
+        except ValueError:
+            return HttpResponse("Invalid marks value")
+        
+        submission = AssignmentSubmission.objects.get(id=submission_id)
+        
+        if submission.assignment_id.subject_id.staff_id != request.user:
+            return HttpResponse("You don't have permission to grade this submission")
+        
+        submission.marks = marks
+        submission.status = 'graded'
+        submission.save()
+        return HttpResponse("OK")
+    except AssignmentSubmission.DoesNotExist:
+        return HttpResponse("Submission not found")
+    except Exception as e:
+        return HttpResponse(f"Error: {str(e)}")
+
+@login_required
+def delete_assignment(request, assignment_id):
+    try:
+        assignment = Assignment.objects.get(id=assignment_id)
+        # Check if the staff member is authorized to delete this assignment
+        if assignment.subject_id.staff_id != request.user:
+            messages.error(request, "You are not authorized to delete this assignment")
+            return redirect('staff_manage_assignments')
+        
+        # Delete the assignment
+        assignment.delete()
+        messages.success(request, "Assignment deleted successfully")
+    except Assignment.DoesNotExist:
+        messages.error(request, "Assignment not found")
+    
+    return redirect('staff_manage_assignments')
+
+def manage_fines(request):
+    fines = Fine.objects.all()
+    context = {
+        "fines": fines
+    }
+    return render(request, 'staff_template/manage_fines_template.html', context)
+
+def add_fine(request):
+    students = Students.objects.all()
+    context = {
+        "students": students
+    }
+    return render(request, 'staff_template/add_fine_template.html', context)
+
+def add_fine_save(request):
+    if request.method != "POST":
+        messages.error(request, "Invalid Method")
+        return redirect('manage_fines')
+    else:
+        student_id = request.POST.get('student')
+        amount = request.POST.get('amount')
+        reason = request.POST.get('reason')
+        due_date = request.POST.get('due_date')
+
+        try:
+            student = Students.objects.get(id=student_id)
+            fine = Fine(
+                student_id=student,
+                amount=float(amount),
+                reason=reason,
+                due_date=due_date
+            )
+            fine.save()
+
+            # Send email notification to student
+            subject = 'New Fine Added'
+            message = f'''Dear {student.admin.first_name} {student.admin.last_name},
+
+A new fine has been added to your account:
+
+Amount: ₹{amount}
+Reason: {reason}
+Due Date: {due_date}
+
+Please log in to your student portal to pay the fine.
+
+Best regards,
+Student Management System'''
+            
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [student.admin.email]
+            try:
+                send_mail(subject, message, from_email, recipient_list)
+            except Exception as e:
+                print(f"Failed to send fine notification email: {str(e)}")
+
+            messages.success(request, "Fine added successfully")
+            return redirect('manage_fines')
+        except Exception as e:
+            messages.error(request, f"Failed to add fine: {str(e)}")
+            return redirect('add_fine')
+
+def delete_fine(request, fine_id):
+    try:
+        fine = Fine.objects.get(id=fine_id, paid=False)
+        fine.delete()
+        messages.success(request, "Fine deleted successfully")
+    except Fine.DoesNotExist:
+        messages.error(request, "Fine not found or already paid")
+    except Exception as e:
+        messages.error(request, f"Error deleting fine: {str(e)}")
+    return redirect('manage_fines')

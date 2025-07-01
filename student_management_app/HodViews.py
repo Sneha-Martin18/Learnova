@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
-from django.core.files.storage import FileSystemStorage #To upload Profile Picture
+from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 import json
 
-from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport
+from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Students, SessionYearModel, \
+    FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport
+
 from .forms import AddStudentForm, EditStudentForm
 
 
@@ -117,11 +119,36 @@ def add_staff_save(request):
 
 
 def manage_staff(request):
-    staffs = Staffs.objects.all()
+    # Get all staff users
+    staff_users = CustomUser.objects.filter(user_type=2).order_by('-id')
+    staffs_dict = {}
+    
+    # Get all existing staff profiles
+    staffs = Staffs.objects.select_related('admin').all()
+    for staff in staffs:
+        staffs_dict[staff.admin.id] = staff
+    
+    # Create a list of staff data, including users without profiles
+    staff_data = []
+    for user in staff_users:
+        data = {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'username': user.username,
+            'has_profile': False,
+            'profile': None
+        }
+        if user.id in staffs_dict:
+            data['has_profile'] = True
+            data['profile'] = staffs_dict[user.id]
+        staff_data.append(data)
+    
     context = {
-        "staffs": staffs
+        "staff_data": staff_data
     }
-    return render(request, "hod_template/manage_staff_template.html", context)
+    return render(request, 'hod_template/manage_staff_template.html', context)
 
 
 def edit_staff(request, staff_id):
@@ -179,6 +206,43 @@ def delete_staff(request, staff_id):
         return redirect('manage_staff')
 
 
+def delete_incomplete_staff(request, user_id):
+    try:
+        # Get the CustomUser object
+        user = CustomUser.objects.get(id=user_id, user_type=2)
+        
+        # Check if the user has a staff profile
+        try:
+            staff = Staffs.objects.get(admin=user)
+            messages.error(request, "Cannot delete: Staff has a complete profile")
+        except Staffs.DoesNotExist:
+            # Delete related records first
+            try:
+                # Delete any subjects assigned to this staff
+                Subjects.objects.filter(staff_id=user).delete()
+                
+                # Delete any attendance records
+                attendance_dates = Attendance.objects.filter(staff_id=user)
+                for attendance in attendance_dates:
+                    AttendanceReport.objects.filter(attendance_id=attendance).delete()
+                attendance_dates.delete()
+                
+                # Delete any feedback
+                FeedBackStaffs.objects.filter(staff_id=user).delete()
+                
+                # Delete any leave reports
+                LeaveReportStaff.objects.filter(staff_id=user).delete()
+                
+                # Finally delete the user
+                user.delete()
+                messages.success(request, "Incomplete staff account deleted successfully!")
+            except Exception as e:
+                messages.error(request, f"Error deleting staff: {str(e)}")
+            
+    except CustomUser.DoesNotExist:
+        messages.error(request, "Staff not found")
+    
+    return redirect('manage_staff')
 
 
 def add_course(request):
@@ -191,13 +255,21 @@ def add_course_save(request):
         return redirect('add_course')
     else:
         course = request.POST.get('course')
+        if not course:
+            messages.error(request, "Course name is required!")
+            return redirect('add_course')
         try:
+            # Check if course already exists
+            if Courses.objects.filter(course_name=course).exists():
+                messages.error(request, "Course already exists!")
+                return redirect('add_course')
+            
             course_model = Courses(course_name=course)
             course_model.save()
             messages.success(request, "Course Added Successfully!")
             return redirect('add_course')
-        except:
-            messages.error(request, "Failed to Add Course!")
+        except Exception as e:
+            messages.error(request, f"Failed to Add Course: {str(e)}")
             return redirect('add_course')
 
 
@@ -264,19 +336,28 @@ def add_session(request):
 def add_session_save(request):
     if request.method != "POST":
         messages.error(request, "Invalid Method")
-        return redirect('add_course')
+        return redirect('add_session')
     else:
         session_start_year = request.POST.get('session_start_year')
         session_end_year = request.POST.get('session_end_year')
 
+        if not session_start_year or not session_end_year:
+            messages.error(request, "Both session start and end years are required!")
+            return redirect('add_session')
+
         try:
+            # Check if session year already exists
+            if SessionYearModel.objects.filter(session_start_year=session_start_year, session_end_year=session_end_year).exists():
+                messages.error(request, "Session year already exists!")
+                return redirect('add_session')
+            
             sessionyear = SessionYearModel(session_start_year=session_start_year, session_end_year=session_end_year)
             sessionyear.save()
             messages.success(request, "Session Year added Successfully!")
-            return redirect("add_session")
-        except:
-            messages.error(request, "Failed to Add Session Year")
-            return redirect("add_session")
+            return redirect('add_session')
+        except Exception as e:
+            messages.error(request, f"Failed to Add Session Year: {str(e)}")
+            return redirect('add_session')
 
 
 def edit_session(request, session_id):
@@ -343,49 +424,126 @@ def add_student_save(request):
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            address = form.cleaned_data['address']
-            session_year_id = form.cleaned_data['session_year_id']
-            course_id = form.cleaned_data['course_id']
-            gender = form.cleaned_data['gender']
+            address = form.cleaned_data.get('address', '')
+            session_year_id = form.cleaned_data.get('session_year_id')
+            course_id = form.cleaned_data.get('course_id')
+            gender = form.cleaned_data.get('gender', '')
+
+            # Check if username already exists
+            if CustomUser.objects.filter(username=username).exists():
+                messages.error(request, "Username already exists. Please choose a different username.")
+                return redirect('add_student')
+
+            # Check if email already exists
+            if CustomUser.objects.filter(email=email).exists():
+                messages.error(request, "Email already exists. Please use a different email.")
+                return redirect('add_student')
 
             # Getting Profile Pic first
-            # First Check whether the file is selected or not
-            # Upload only if file is selected
-            if len(request.FILES) != 0:
+            if 'profile_pic' in request.FILES:
                 profile_pic = request.FILES['profile_pic']
-                fs = FileSystemStorage()
-                filename = fs.save(profile_pic.name, profile_pic)
-                profile_pic_url = fs.url(filename)
             else:
-                profile_pic_url = None
-
+                profile_pic = None
 
             try:
-                user = CustomUser.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name, user_type=3)
-                user.students.address = address
+                # Validate course and session year before creating user
+                course_obj = None
+                session_year_obj = None
 
-                course_obj = Courses.objects.get(id=course_id)
-                user.students.course_id = course_obj
+                if course_id:
+                    try:
+                        course_obj = Courses.objects.get(id=int(course_id))
+                    except (Courses.DoesNotExist, ValueError):
+                        messages.error(request, "Invalid course selected. Please try again.")
+                        return redirect('add_student')
+                else:
+                    messages.error(request, "Course is required.")
+                    return redirect('add_student')
 
-                session_year_obj = SessionYearModel.objects.get(id=session_year_id)
-                user.students.session_year_id = session_year_obj
+                if session_year_id:
+                    try:
+                        session_year_obj = SessionYearModel.objects.get(id=int(session_year_id))
+                    except (SessionYearModel.DoesNotExist, ValueError):
+                        messages.error(request, "Invalid session year selected. Please try again.")
+                        return redirect('add_student')
+                else:
+                    messages.error(request, "Session year is required.")
+                    return redirect('add_student')
 
-                user.students.gender = gender
-                user.students.profile_pic = profile_pic_url
-                user.save()
-                messages.success(request, "Student Added Successfully!")
-                return redirect('add_student')
-            except:
-                messages.error(request, "Failed to Add Student!")
+                # Check if a student with this email already exists
+                if Students.objects.filter(admin__email=email).exists():
+                    messages.error(request, "A student with this email already exists.")
+                    return redirect('add_student')
+
+                # Create user object
+                user = CustomUser.objects.create_user(
+                    username=username,
+                    password=password,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    user_type=3
+                )
+
+                try:
+                    # Create student profile
+                    student = Students.objects.create(
+                        admin=user,
+                        address=address,
+                        course_id=course_obj,
+                        session_year_id=session_year_obj,
+                        gender=gender,
+                        profile_pic=profile_pic
+                    )
+                    messages.success(request, "Student Added Successfully!")
+                    return redirect('manage_student')
+                except Exception as e:
+                    # If student profile creation fails, delete the user and show detailed error
+                    user.delete()
+                    print(f"Error creating student profile: {str(e)}")
+                    messages.error(request, f"Failed to create student profile: {str(e)}")
+                    return redirect('add_student')
+                
+            except Exception as e:
+                messages.error(request, f"Failed to Add Student: {str(e)}")
                 return redirect('add_student')
         else:
+            # If form is not valid, show form errors
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
             return redirect('add_student')
 
 
 def manage_student(request):
-    students = Students.objects.all()
+    # Get all student users
+    student_users = CustomUser.objects.filter(user_type=3).order_by('-id')
+    students_dict = {}
+    
+    # Get all existing student profiles
+    students = Students.objects.select_related('admin', 'course_id', 'session_year_id').all()
+    for student in students:
+        students_dict[student.admin.id] = student
+    
+    # Create a list of student data, including users without profiles
+    student_data = []
+    for user in student_users:
+        data = {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'username': user.username,
+            'has_profile': False,
+            'profile': None
+        }
+        if user.id in students_dict:
+            data['has_profile'] = True
+            data['profile'] = students_dict[user.id]
+        student_data.append(data)
+    
     context = {
-        "students": students
+        "student_data": student_data
     }
     return render(request, 'hod_template/manage_student_template.html', context)
 
@@ -488,6 +646,26 @@ def delete_student(request, student_id):
     except:
         messages.error(request, "Failed to Delete Student.")
         return redirect('manage_student')
+
+
+def delete_incomplete_student(request, user_id):
+    try:
+        # Get the CustomUser object
+        user = CustomUser.objects.get(id=user_id, user_type=3)
+        
+        # Check if the user has a student profile
+        try:
+            student = Students.objects.get(admin=user)
+            messages.error(request, "Cannot delete: Student has a complete profile")
+        except Students.DoesNotExist:
+            # Only delete if there's no student profile
+            user.delete()
+            messages.success(request, "Incomplete student account deleted successfully!")
+            
+    except CustomUser.DoesNotExist:
+        messages.error(request, "Student not found")
+    
+    return redirect('manage_student')
 
 
 def add_subject(request):
@@ -787,8 +965,53 @@ def staff_profile(request):
     pass
 
 
-def student_profile(requtest):
-    pass
+def student_profile(request):
+    return render(request, "hod_template/student_profile_template.html")
 
 
+def manage_passwords(request):
+    students = CustomUser.objects.filter(user_type=3)
+    staff = CustomUser.objects.filter(user_type=2)
+    context = {
+        'students': students,
+        'staff': staff
+    }
+    return render(request, 'hod_template/manage_passwords.html', context)
 
+
+def reset_password(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        new_password = request.POST.get('new_password')
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            user.set_password(new_password)
+            user.save()
+            messages.success(request, "Password reset successful")
+        except CustomUser.DoesNotExist:
+            messages.error(request, "User not found")
+        except Exception as e:
+            messages.error(request, f"Error resetting password: {str(e)}")
+    return redirect('manage_passwords')
+
+
+def change_own_password(request):
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if new_password != confirm_password:
+            messages.error(request, "New passwords do not match!")
+            return redirect('admin_profile')
+            
+        user = request.user
+        if user.check_password(old_password):
+            user.set_password(new_password)
+            user.save()
+            messages.success(request, "Password changed successfully")
+            return redirect('login')
+        else:
+            messages.error(request, "Old password is incorrect!")
+            
+    return redirect('admin_profile')
