@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # User Service
+  user_service:
+    build: ./user_service
+    ports:
+      - "8001:8001"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=sqlite:///user_service.db
+    volumes:
+      - ./user_service:/app
+    networks:
+      - microservices_network
+
+  # Academic Service
+  academic_service:
+    build: ./academic_service
+    ports:
+      - "8002:8002"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=sqlite:///academic_service.db
+    volumes:
+      - ./academic_service:/app
+    networks:
+      - microservices_network
+
+  # Attendance Service
+  attendance_service:
+    build: ./attendance_service
+    ports:
+      - "8003:8003"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=sqlite:///attendance_service.db
+    volumes:
+      - ./attendance_service:/app
+    networks:
+      - microservices_network
+
+  # Assessment Service
+  assessment_service:
+    build: ./assessment_service
+    ports:
+      - "8004:8004"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=sqlite:///assessment_service.db
+    volumes:
+      - ./assessment_service:/app
+    networks:
+      - microservices_network
+
+  # Communication Service
+  communication_service:
+    build: ./communication_service
+    ports:
+      - "8005:8005"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=sqlite:///communication_service.db
+    volumes:
+      - ./communication_service:/app
+    networks:
+      - microservices_network
+
+  # Leave Service
+  leave_service:
+    build: ./leave_service
+    ports:
+      - "8006:8006"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=sqlite:///leave_service.db
+    volumes:
+      - ./leave_service:/app
+    networks:
+      - microservices_network
+
+  # Financial Service
+  financial_service:
+    build: ./financial_service
+    ports:
+      - "8007:8007"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=sqlite:///financial_service.db
+    volumes:
+      - ./financial_service:/app
+    networks:
+      - microservices_network
+
+  # API Gateway
+  api_gateway:
+    build: ./api_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+    volumes:
+      - ./api_gateway:/app
+    depends_on:
+      - user_service
+      - academic_service
+      - attendance_service
+      - assessment_service
+      - communication_service
+      - leave_service
+      - financial_service
+    networks:
+      - microservices_network
+
+networks:
+  microservices_network:
+    driver: bridge 
