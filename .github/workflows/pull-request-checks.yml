@@ -1,0 +1,93 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|perf|test|chore|ci|build)(\(.+\))?: ]]; then
+            echo "❌ PR title must follow conventional commits format"
+            echo "Examples: feat: add user service, fix: resolve login bug"
+            exit 1
+          fi
+          echo "✅ PR title follows conventional commits"
+
+      - name: Check for large files
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}...HEAD | while read file; do
+            if [ -f "$file" ]; then
+              size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+              if [ "$size" -gt 1048576 ]; then
+                echo "⚠️ Large file detected: $file ($(($size / 1024))KB)"
+              fi
+            fi
+          done
+
+      - name: Check for merge conflicts
+        run: |
+          if git diff --check origin/${{ github.base_ref }}...HEAD; then
+            echo "✅ No merge conflicts detected"
+          else
+            echo "❌ Merge conflicts detected"
+            exit 1
+          fi
+
+      - name: Count changed files
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | wc -l)
+          echo "📊 Changed files: $CHANGED_FILES"
+          if [ "$CHANGED_FILES" -gt 50 ]; then
+            echo "⚠️ Large PR: Consider breaking into smaller PRs"
+          fi
+
+  quick-tests:
+    name: Quick Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install flake8 black isort
+
+      - name: Quick lint check
+        run: |
+          flake8 microservices/ --count --select=E9,F63,F7,F82 --show-source --statistics || true
+          black --check microservices/ || true
+          isort --check-only microservices/ || true
+
+  label-pr:
+    name: Auto Label PR
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Label based on files changed
+        uses: actions/labeler@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

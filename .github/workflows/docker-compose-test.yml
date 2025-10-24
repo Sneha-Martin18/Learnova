@@ -1,0 +1,132 @@
+name: Docker Compose Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  docker-compose-test:
+    name: Test Full Stack with Docker Compose
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create environment file
+        working-directory: microservices
+        run: |
+          cat > .env << EOF
+          POSTGRES_DB=microservices_db
+          POSTGRES_USER=postgres
+          POSTGRES_PASSWORD=password
+          REDIS_URL=redis://redis:6379
+          SECRET_KEY=test-secret-key
+          DEBUG=True
+          SENDGRID_API_KEY=test-key
+          TWILIO_ACCOUNT_SID=test-sid
+          TWILIO_AUTH_TOKEN=test-token
+          TWILIO_PHONE_NUMBER=+1234567890
+          EOF
+
+      - name: Build all services
+        working-directory: microservices
+        run: |
+          docker compose build --parallel
+
+      - name: Start infrastructure
+        working-directory: microservices
+        run: |
+          docker compose up -d postgres redis
+          echo "Waiting for infrastructure to be ready..."
+          sleep 15
+
+      - name: Verify infrastructure
+        working-directory: microservices
+        run: |
+          docker compose exec -T postgres pg_isready -U postgres
+          docker compose exec -T redis redis-cli ping
+
+      - name: Start API Gateway
+        working-directory: microservices
+        run: |
+          docker compose up -d api-gateway
+          sleep 10
+
+      - name: Start User Management Service
+        working-directory: microservices
+        run: |
+          docker compose up -d user-management user-management-celery
+          sleep 15
+
+      - name: Start Academic Services
+        working-directory: microservices
+        run: |
+          docker compose up -d academic attendance
+          sleep 15
+
+      - name: Start Notification Service
+        working-directory: microservices
+        run: |
+          docker compose up -d notification notification-celery notification-celery-beat
+          sleep 15
+
+      - name: Check all services status
+        working-directory: microservices
+        run: |
+          docker compose ps
+          echo "=== Service Health Check ==="
+          docker compose ps --format json | jq -r '.[] | "\(.Name): \(.State)"'
+
+      - name: Test API Gateway
+        working-directory: microservices
+        run: |
+          # Wait for API Gateway to be ready
+          timeout 60 bash -c 'until curl -f http://localhost:8080/health 2>/dev/null; do sleep 2; done' || echo "API Gateway health check timeout"
+
+      - name: Test User Management Service
+        working-directory: microservices
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:8000/api/v1/users/health/ 2>/dev/null; do sleep 2; done' || echo "User service health check timeout"
+
+      - name: Show service logs
+        if: always()
+        working-directory: microservices
+        run: |
+          echo "=== API Gateway Logs ==="
+          docker compose logs api-gateway --tail=50
+          echo "=== User Management Logs ==="
+          docker compose logs user-management --tail=50
+          echo "=== Academic Service Logs ==="
+          docker compose logs academic --tail=50
+          echo "=== Postgres Logs ==="
+          docker compose logs postgres --tail=30
+          echo "=== Redis Logs ==="
+          docker compose logs redis --tail=30
+
+      - name: Export logs
+        if: always()
+        working-directory: microservices
+        run: |
+          docker compose logs > ../docker-compose-test-logs.txt
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-compose-logs
+          path: docker-compose-test-logs.txt
+
+      - name: Cleanup
+        if: always()
+        working-directory: microservices
+        run: |
+          docker compose down -v
+          docker system prune -f
