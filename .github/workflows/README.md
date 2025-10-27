@@ -1,6 +1,6 @@
 # GitHub Actions Workflows
 
-This directory contains automated CI/CD workflows for the Django Student Management System.
+This directory contains automated CI/CD workflows for the Django Student Management System (Monolithic Architecture).
 
 ## Quick Start
 
@@ -26,17 +26,17 @@ SLACK_WEBHOOK=<slack-webhook-url>
 
 | Workflow | File | Trigger | Purpose |
 |----------|------|---------|---------|
-| **CI/CD Pipeline** | `ci-cd.yml` | Push, PR | Main pipeline for testing and building |
+| **Monolithic CI/CD** | `ci-cd.yml` | Push, PR | Main pipeline for monolithic Django app |
 | **Docker Publish** | `docker-publish.yml` | Release, Manual | Publish Docker images to registry |
 | **Deploy** | `deploy.yml` | Manual | Deploy to staging/production |
 | **PR Checks** | `pr-checks.yml` | Pull Request | Automated PR validation |
 
 ## Workflow Details
 
-### CI/CD Pipeline
+### Monolithic CI/CD Pipeline
 - ✅ Code quality checks (Black, isort, Flake8)
-- ✅ Unit tests for all microservices
-- ✅ Docker image builds
+- ✅ Unit tests for Django monolithic application
+- ✅ Docker image build for monolith
 - ✅ Security vulnerability scanning
 - ✅ Integration tests
 - ✅ Auto-deploy to staging/production
@@ -97,7 +97,7 @@ git push origin v1.0.0
 Add these to your README.md:
 
 ```markdown
-![CI/CD](https://github.com/<owner>/<repo>/workflows/CI/CD%20Pipeline/badge.svg)
+![Monolithic CI/CD](https://github.com/<owner>/<repo>/workflows/Monolithic%20CI/CD%20Pipeline/badge.svg)
 ![Docker](https://github.com/<owner>/<repo>/workflows/Docker%20Image%20Publishing/badge.svg)
 ```
 
