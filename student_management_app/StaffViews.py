@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, time
 
 from django.conf import settings
 from django.contrib import messages
@@ -235,41 +236,116 @@ def get_students(request):
     )
 
 
+@login_required
+def cleanup_attendance_duplicates(request):
+    """Remove existing duplicate Attendance rows and merge AttendanceReport.
+    Keeps a single Attendance per (subject_id, session_year_id, attendance_date).
+    """
+    try:
+        duplicates_removed = 0
+        reports_merged = 0
+        # Group all attendances by unique key
+        all_att = Attendance.objects.all().order_by("id")
+        groups = {}
+        for a in all_att:
+            key = (a.subject_id_id, a.session_year_id_id, a.attendance_date)
+            groups.setdefault(key, []).append(a)
+
+        for key, items in groups.items():
+            if len(items) <= 1:
+                continue
+            keep = items[0]
+            for dup in items[1:]:
+                # Move/merge reports from dup to keep
+                dup_reports = AttendanceReport.objects.filter(attendance_id=dup)
+                for r in dup_reports:
+                    ar, created = AttendanceReport.objects.get_or_create(
+                        student_id=r.student_id, attendance_id=keep,
+                        defaults={"status": r.status}
+                    )
+                    if not created and ar.status != r.status:
+                        ar.status = r.status
+                        ar.save()
+                    reports_merged += 1
+                # Delete the duplicate attendance (will cascade delete its reports)
+                dup.delete()
+                duplicates_removed += 1
+        messages.success(
+            request,
+            f"Cleanup complete. Removed {duplicates_removed} duplicate attendance rows; merged {reports_merged} reports.",
+        )
+    except Exception as e:
+        messages.error(request, f"Cleanup failed: {str(e)}")
+    return redirect("staff_take_attendance")
+
+
 @csrf_exempt
 def save_attendance_data(request):
     # Get Values from Staf Take Attendance form via AJAX (JavaScript)
     # Use getlist to access HTML Array/List Input Data
     student_ids = request.POST.get("student_ids")
     subject_id = request.POST.get("subject_id")
-    attendance_date = request.POST.get("attendance_date")
+    attendance_date_input = request.POST.get("attendance_date")
     session_year_id = request.POST.get("session_year_id")
 
-    subject_model = Subjects.objects.get(id=subject_id)
-    session_year_model = SessionYearModel.objects.get(id=session_year_id)
+    subject_model = Subjects.objects.get(id=int(subject_id))
+    session_year_model = SessionYearModel.objects.get(id=int(session_year_id))
 
-    json_student = json.loads(student_ids)
+    if not student_ids:
+        return JsonResponse({"status": "error", "message": "no students provided"})
+    try:
+        json_student = json.loads(student_ids)
+    except Exception:
+        return JsonResponse({"status": "error", "message": "invalid students payload"})
     # print(dict_student[0]['id'])
 
     # print(student_ids)
     try:
-        # First Attendance Data is Saved on Attendance Model
-        attendance = Attendance(
+        # Parse attendance_date from string to date
+        if not attendance_date_input:
+            return JsonResponse({"status": "error", "message": "missing date"})
+        try:
+            if "/" in attendance_date_input:
+                parsed_date = datetime.strptime(attendance_date_input, "%d/%m/%Y").date()
+            else:
+                # Expect ISO format from input type=date
+                parsed_date = datetime.strptime(attendance_date_input, "%Y-%m-%d").date()
+        except Exception:
+            return JsonResponse({"status": "error", "message": "invalid date format"})
+        # Idempotent: reuse existing Attendance for same subject/date/session
+        attendance, _created = Attendance.objects.get_or_create(
             subject_id=subject_model,
-            attendance_date=attendance_date,
+            attendance_date=parsed_date,
             session_year_id=session_year_model,
         )
-        attendance.save()
 
+        saved = 0
         for stud in json_student:
-            # Attendance of Individual Student saved on AttendanceReport Model
-            student = Students.objects.get(admin=stud["id"])
-            attendance_report = AttendanceReport(
-                student_id=student, attendance_id=attendance, status=stud["status"]
-            )
-            attendance_report.save()
-        return HttpResponse("OK")
-    except:
-        return HttpResponse("Error")
+            try:
+                sid = int(stud.get("id"))
+                status_val = stud.get("status", 0)
+                status_bool = bool(int(status_val))
+                student = Students.objects.get(admin_id=sid)
+                # Upsert student's attendance for this date
+                ar, _ = AttendanceReport.objects.get_or_create(
+                    student_id=student, attendance_id=attendance,
+                    defaults={"status": status_bool}
+                )
+                if ar.status != status_bool:
+                    ar.status = status_bool
+                    ar.save()
+                saved += 1
+            except Students.DoesNotExist:
+                # Skip invalid student IDs
+                continue
+            except Exception:
+                continue
+        if saved:
+            return JsonResponse({"status": "OK"})
+        else:
+            return JsonResponse({"status": "error", "message": "no valid students saved"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)})
 
 
 def staff_update_attendance(request):
@@ -476,15 +552,28 @@ def add_assignment_save(request):
         subject_id = request.POST.get("subject")
         title = request.POST.get("title")
         description = request.POST.get("description")
-        due_date = request.POST.get("due_date")
+        due_date_input = request.POST.get("due_date")
 
         try:
+            # Parse due date: support both date-only (YYYY-MM-DD) and datetime-local (YYYY-MM-DDTHH:MM)
+            if not due_date_input:
+                raise ValueError("Due date is required")
+
+            try:
+                if "T" in due_date_input:
+                    parsed_due_date = datetime.fromisoformat(due_date_input)
+                else:
+                    parsed_date = datetime.fromisoformat(due_date_input).date()
+                    parsed_due_date = datetime.combine(parsed_date, time(23, 59))
+            except Exception:
+                raise ValueError("Invalid due date format")
+
             subject = Subjects.objects.get(id=subject_id)
             assignment = Assignment(
                 subject_id=subject,
                 title=title,
                 description=description,
-                due_date=due_date,
+                due_date=parsed_due_date,
             )
             assignment.save()
             messages.success(request, "Assignment Added Successfully!")

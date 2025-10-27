@@ -10,6 +10,7 @@ def create_admin():
     try:
         # Create custom user
         user = CustomUser.objects.create_user(
+            username="admin",
             email="admin@gmail.com",
             password="admin@123",
             user_type=1,  # 1 for admin

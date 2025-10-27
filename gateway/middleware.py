@@ -5,7 +5,8 @@ from django.core.cache import cache
 from .config import (
     SERVICE_ROUTES, DEFAULT_TIMEOUT, ACADEMIC_SERVICES,
     ADMIN_SERVICES, USER_SERVICES, FINANCIAL_SERVICES,
-    ENABLE_CACHING, ENABLE_RATE_LIMITING, ENABLE_AUTH_CHECK
+    ENABLE_CACHING, ENABLE_RATE_LIMITING, ENABLE_AUTH_CHECK,
+    BASE_URL
 )
 
 logger = logging.getLogger(__name__)
@@ -51,11 +52,17 @@ class GatewayMiddleware:
         if service not in SERVICE_ROUTES:
             return self.get_response(request)
 
+        # Prevent self-forwarding in monolith mode: if target base is this same app,
+        # simply handle the request locally (skip proxy and rate limit here)
+        target_base = SERVICE_ROUTES[service]
+        if target_base.startswith(BASE_URL):
+            return self.get_response(request)
+
         # Auth check for protected routes
         if ENABLE_AUTH_CHECK and not self._check_auth(request):
             return JsonResponse({'error': 'Authentication required'}, status=401)
 
-        # Rate limiting
+        # Rate limiting (only when proxying to external services)
         if ENABLE_RATE_LIMITING:
             rate_key = f"rate_limit:{request.META.get('REMOTE_ADDR')}:{service}"
             request_count = cache.get(rate_key, 0)

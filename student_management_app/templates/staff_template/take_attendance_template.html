@@ -102,9 +102,9 @@
             var session_year=$("#session_year").val()
 
             $.ajax({
-                url:'{% url 'get_students' %}',
+                url:"{% url 'get_students' %}",
                 type:'POST',
-                data:{subject:subject, session_year:session_year},
+                data:{subject:subject, session_year:session_year}
             })
 
             
@@ -139,7 +139,7 @@
                 $(this).text("Saving Attendance Data...")
 
                 //console.log("SAVE")
-                var student_data=$("input[name='student_data[]'").map(function(){ 
+                var student_data=$("input[name='student_data[]']").map(function(){ 
                         if($(this).is(":checked")){
                             return {"id":$(this).val(), "status":1}; // Getting ID and Value of Students
                         }
@@ -158,29 +158,30 @@
                 // Saving Attendance Data into Database
 
                 $.ajax({
-                    url:'{% url 'save_attendance_data' %}',
+                    url:"{% url 'save_attendance_data' %}",
                     type:'POST',
                     data:{student_ids:student_data, attendance_date:attendance_date, subject_id:subject_id, session_year_id:session_year_id},
+                    dataType:'json'
                 })
 
                 
                 .done(function(response){
-                    
-                    if(response=="OK")
-                    {
-                        alert("Attendance Saved!")
+                    var data = response;
+                    if(typeof response === 'string'){
+                        try { data = JSON.parse(response); } catch(e) {}
                     }
-                    else
-                    {
-                        alert("Failed to Save Attendance!")
+                    if(data && data.status === "OK"){
+                        alert("Attendance Saved!");
+                        location.reload();
+                    } else {
+                        var msg = (data && data.message) ? data.message : (response || "Failed to Save Attendance!");
+                        alert(msg);
                     }
-                    location.reload()
-                    
-                    //console.log(response)
                 })
 
-                .fail(function(){
-                    alert("Error in Saving Students Attendance Data.")
+                .fail(function(jqXHR, textStatus, errorThrown){
+                    var msg = jqXHR && jqXHR.responseText ? jqXHR.responseText : (errorThrown || textStatus || "Error in Saving Students Attendance Data.");
+                    alert(msg);
                 })
 
             })

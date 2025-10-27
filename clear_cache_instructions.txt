@@ -1,0 +1,26 @@
+BROWSER CACHE CLEAR INSTRUCTIONS:
+
+OPTION 1 - Quick Hard Refresh:
+1. Press Ctrl + Shift + R (or Cmd + Shift + R on Mac)
+2. This forces a reload without cache
+
+OPTION 2 - Manual Cache Clear:
+1. Press Ctrl + Shift + Delete
+2. Select "Cached Web Content" 
+3. Click "Clear Now"
+4. Reload the page
+
+OPTION 3 - Developer Mode:
+1. Press F12 to open Developer Tools
+2. Right-click the refresh button
+3. Select "Empty Cache and Hard Reload"
+
+IMPORTANT: After clearing cache, you should see a properly styled admin dashboard with:
+- Sidebar navigation with icons
+- Colorful card widgets
+- Bootstrap-styled buttons
+- AdminLTE theme colors
+
+Server URL: http://localhost:8000/
+Login: admin@gmail.com
+Password: admin

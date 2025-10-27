@@ -213,13 +213,32 @@ def edit_staff_save(request):
 
 
 def delete_staff(request, staff_id):
-    staff = Staffs.objects.get(admin=staff_id)
     try:
+        # Resolve both the user and the staff profile
+        user = CustomUser.objects.get(id=staff_id, user_type=2)
+        staff = Staffs.objects.get(admin=user)
+
+        # Clean up related data that references Staffs or the staff CustomUser
+        # 1) Subjects assigned to this staff (Subjects.staff_id -> CustomUser)
+        Subjects.objects.filter(staff_id=user).delete()
+
+        # 2) Attendance for those subjects and their reports
+        attendance_qs = Attendance.objects.filter(subject_id__staff_id=user)
+        AttendanceReport.objects.filter(attendance_id__in=attendance_qs).delete()
+        attendance_qs.delete()
+
+        # 3) Feedback and Leave reports referencing Staffs
+        FeedBackStaffs.objects.filter(staff_id=staff).delete()
+        LeaveReportStaff.objects.filter(staff_id=staff).delete()
+
+        # Finally delete Staff profile then the user
         staff.delete()
+        user.delete()
+
         messages.success(request, "Staff Deleted Successfully.")
         return redirect("manage_staff")
-    except:
-        messages.error(request, "Failed to Delete Staff.")
+    except Exception as e:
+        messages.error(request, f"Failed to Delete Staff: {str(e)}")
         return redirect("manage_staff")
 
 
@@ -238,17 +257,16 @@ def delete_incomplete_staff(request, user_id):
                 # Delete any subjects assigned to this staff
                 Subjects.objects.filter(staff_id=user).delete()
 
-                # Delete any attendance records
-                attendance_dates = Attendance.objects.filter(staff_id=user)
-                for attendance in attendance_dates:
-                    AttendanceReport.objects.filter(attendance_id=attendance).delete()
+                # Delete any attendance records (Attendance has no direct staff FK)
+                attendance_dates = Attendance.objects.filter(subject_id__staff_id=user)
+                AttendanceReport.objects.filter(attendance_id__in=attendance_dates).delete()
                 attendance_dates.delete()
 
                 # Delete any feedback
-                FeedBackStaffs.objects.filter(staff_id=user).delete()
+                FeedBackStaffs.objects.filter(staff_id__admin=user).delete()
 
                 # Delete any leave reports
-                LeaveReportStaff.objects.filter(staff_id=user).delete()
+                LeaveReportStaff.objects.filter(staff_id__admin=user).delete()
 
                 # Finally delete the user
                 user.delete()

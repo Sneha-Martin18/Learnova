@@ -16,7 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://lms-c3gnarhvgabjf5.centralus-01.azurewebsites.net/'
+    'https://Learnova-c3gnarhvgabjf5.centralus-01.azurewebsites.net/'
 ]
 
 # Application definition
@@ -161,6 +161,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For developm
 # EMAIL_HOST_USER = 'your_email@gmail.com'
 # EMAIL_HOST_PASSWORD = 'your_app_password'
 
-# Razorpay Configuration
-RAZORPAY_KEY_ID = 'rzp_test_ASHdnRyVQbHHIq'  # Replace with your test key
-RAZORPAY_KEY_SECRET = 'ILcRiBT9j1ErPSEBHperL7vu'  # Replace with your test secret
+# Razorpay Configuration (read from environment for security)
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', 'rzp_test_ASHdnRyVQbHHIq')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', 'ILcRiBT9j1ErPSEBHperL7vu')

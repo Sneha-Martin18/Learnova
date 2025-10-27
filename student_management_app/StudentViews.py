@@ -10,6 +10,8 @@ from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.utils import timezone
+import uuid
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -86,16 +88,34 @@ def student_view_attendance_post(request):
         start_date = request.POST.get("start_date")
         end_date = request.POST.get("end_date")
 
-        # Parsing the date data into Python object
-        start_date_parse = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
-        end_date_parse = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+        # Validate and parse dates
+        if not start_date or not end_date:
+            messages.error(request, "Please select both start and end dates.")
+            return redirect("student_view_attendance")
+
+        def parse_date_safe(s):
+            for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
+                try:
+                    return datetime.datetime.strptime(s, fmt).date()
+                except Exception:
+                    continue
+            return None
+
+        start_date_parse = parse_date_safe(start_date)
+        end_date_parse = parse_date_safe(end_date)
+        if not start_date_parse or not end_date_parse:
+            messages.error(request, "Invalid date format. Use the date pickers to select dates.")
+            return redirect("student_view_attendance")
 
         # Getting all the Subject Data based on Selected Subject
-        subject_obj = Subjects.objects.get(id=subject_id)
-        # Getting Logged In User Data
-        user_obj = CustomUser.objects.get(id=request.user.id)
-        # Getting Student Data Based on Logged in Data
-        stud_obj = Students.objects.get(admin=user_obj)
+        try:
+            subject_obj = Subjects.objects.get(id=int(subject_id))
+        except Exception:
+            messages.error(request, "Invalid subject selection.")
+            return redirect("student_view_attendance")
+
+        # Getting Student Data Based on Logged in User
+        stud_obj = Students.objects.get(admin_id=request.user.id)
 
         # Now Accessing Attendance Data based on the Range of Date Selected and Subject Selected
         attendance = Attendance.objects.filter(
@@ -295,41 +315,73 @@ def student_view_fines(request):
 def initialize_payment(request, fine_id):
     try:
         fine = Fine.objects.get(id=fine_id, student_id__admin=request.user, paid=False)
-        client = razorpay.Client(
-            auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
-        )
-
         # Convert amount to paise (Razorpay expects amount in smallest currency unit)
         amount_in_paise = int(fine.amount * 100)
 
-        payment_data = {
-            "amount": amount_in_paise,
-            "currency": "INR",
-            "receipt": f"fine_{fine.id}",
-            "notes": {
-                "fine_id": fine.id,
-                "student_id": fine.student_id.id,
-                "reason": fine.reason,
-            },
-        }
+        try:
+            client = razorpay.Client(
+                auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+            )
 
-        order = client.order.create(data=payment_data)
+            payment_data = {
+                "amount": amount_in_paise,
+                "currency": "INR",
+                "receipt": f"fine_{fine.id}",
+                "notes": {
+                    "fine_id": fine.id,
+                    "student_id": fine.student_id.id,
+                    "reason": fine.reason,
+                },
+            }
 
-        context = {
-            "fine": fine,
-            "razorpay_key": settings.RAZORPAY_KEY_ID,
-            "amount_in_paise": amount_in_paise,
-            "currency": "INR",
-            "order_id": order["id"],
-        }
+            order = client.order.create(data=payment_data)
 
-        return render(request, "student_template/payment_page.html", context)
+            context = {
+                "fine": fine,
+                "razorpay_key": settings.RAZORPAY_KEY_ID,
+                "amount_in_paise": amount_in_paise,
+                "currency": "INR",
+                "order_id": order["id"],
+                "dev_mode": False,
+            }
+            return render(request, "student_template/payment_page.html", context)
+        except Exception as e:
+            # In development, allow a fallback path to test the flow without live credentials
+            if getattr(settings, "DEBUG", False):
+                messages.warning(request, f"Using dev payment mode: {str(e)}")
+                context = {
+                    "fine": fine,
+                    "amount_in_paise": amount_in_paise,
+                    "currency": "INR",
+                    "order_id": f"dev_order_{fine.id}",
+                    "dev_mode": True,
+                }
+                return render(request, "student_template/payment_page.html", context)
+            else:
+                raise
     except Fine.DoesNotExist:
         messages.error(request, "Fine not found or already paid")
         return redirect("student_view_fines")
     except Exception as e:
         messages.error(request, f"Error initializing payment: {str(e)}")
         return redirect("student_view_fines")
+
+
+def dev_pay_fine(request, fine_id):
+    # Development helper to mark a fine as paid without Razorpay
+    if not getattr(settings, "DEBUG", False):
+        messages.error(request, "Not allowed")
+        return redirect("student_view_fines")
+    try:
+        fine = Fine.objects.get(id=fine_id, student_id__admin=request.user, paid=False)
+        fine.paid = True
+        fine.payment_id = f"DEV-{uuid.uuid4()}"
+        fine.payment_date = timezone.now()
+        fine.save()
+        messages.success(request, "Payment simulated successfully in DEV mode.")
+    except Fine.DoesNotExist:
+        messages.error(request, "Fine not found or already paid")
+    return redirect("student_view_fines")
 
 
 @csrf_exempt

@@ -241,6 +241,18 @@ urlpatterns = [
         StudentViews.payment_callback,
         name="payment_callback",
     ),
+    # Maintenance utilities (staff-only views)
+    path(
+        "staff/cleanup_attendance_duplicates/",
+        StaffViews.cleanup_attendance_duplicates,
+        name="cleanup_attendance_duplicates",
+    ),
+    # Development-only simulated payment (works when DEBUG=True)
+    path(
+        "student/dev_pay_fine/<int:fine_id>/",
+        StudentViews.dev_pay_fine,
+        name="dev_pay_fine",
+    ),
     # Student URLs
     path("student_home/", StudentViews.student_home, name="student_home"),
     path(

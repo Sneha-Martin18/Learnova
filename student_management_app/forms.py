@@ -51,6 +51,27 @@ class AddStudentForm(forms.Form):
         widget=forms.FileInput(attrs={"class": "form-control"}),
     )
 
+    def __init__(self, *args, **kwargs):
+        super(EditStudentForm, self).__init__(*args, **kwargs)
+        # Refresh choices so new Courses/Sessions appear without restart
+        try:
+            self.fields["course_id"].choices = [
+                (course.id, course.course_name) for course in Courses.objects.all()
+            ]
+        except Exception:
+            self.fields["course_id"].choices = []
+
+        try:
+            self.fields["session_year_id"].choices = [
+                (
+                    session.id,
+                    f"{session.session_start_year} to {session.session_end_year}",
+                )
+                for session in SessionYearModel.objects.all()
+            ]
+        except Exception:
+            self.fields["session_year_id"].choices = []
+
     # For course selection
     try:
         courses = Courses.objects.all()
@@ -85,6 +106,27 @@ class AddStudentForm(forms.Form):
         choices=session_list,
         widget=forms.Select(attrs={"class": "form-control"}),
     )
+
+    def __init__(self, *args, **kwargs):
+        super(AddStudentForm, self).__init__(*args, **kwargs)
+        # Refresh choices at runtime so new Courses/Sessions appear without restart
+        try:
+            self.fields["course_id"].choices = [
+                (course.id, course.course_name) for course in Courses.objects.all()
+            ]
+        except Exception:
+            self.fields["course_id"].choices = []
+
+        try:
+            self.fields["session_year_id"].choices = [
+                (
+                    session.id,
+                    f"{session.session_start_year} to {session.session_end_year}",
+                )
+                for session in SessionYearModel.objects.all()
+            ]
+        except Exception:
+            self.fields["session_year_id"].choices = []
 
 
 class EditStudentForm(forms.Form):

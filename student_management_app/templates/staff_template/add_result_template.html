@@ -105,9 +105,9 @@
             var session_year=$("#session_year").val()
 
             $.ajax({
-                url:'{% url 'get_students' %}',
+                url:"{% url 'get_students' %}",
                 type:'POST',
-                data:{subject:subject, session_year:session_year},
+                data:{subject:subject, session_year:session_year}
             })
 
             
@@ -119,7 +119,7 @@
 
                 for(key in json_data)
                 {
-                    div_data+="<option value='"+ json_data[key]['id'] +"'>ID: "+ json_data[key]['id'] +" : "+ json_data[key]['name'] +"</option>";
+                    div_data+="<option value='"+ json_data[key]['id'] +"'>"+ json_data[key]['name'] +"</option>";
 
                 }
                 div_data+="</select>";
