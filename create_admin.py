@@ -8,6 +8,11 @@ from student_management_app.models import CustomUser, AdminHOD
 
 def create_admin():
     try:
+        # Check if admin already exists
+        if CustomUser.objects.filter(username="admin").exists():
+            print("Admin user already exists. Skipping creation.")
+            return
+        
         # Create custom user
         user = CustomUser.objects.create_user(
             username="admin",
@@ -23,12 +28,12 @@ def create_admin():
             admin=user
         )
         
-        print("Admin user created successfully!")
-        print("Email: admin@gmail.com")
-        print("Password: admin@123")
+        print("✅ Admin user created successfully!")
+        print("   Email: admin@gmail.com")
+        print("   Password: admin@123")
         
     except Exception as e:
-        print(f"Error creating admin: {str(e)}")
+        print(f"❌ Error creating admin: {str(e)}")
 
 if __name__ == "__main__":
     create_admin()
