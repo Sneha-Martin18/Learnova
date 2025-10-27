@@ -52,7 +52,7 @@ Your CI/CD implementation is **WELL-STRUCTURED** but **NOT ACTIVE** yet. The wor
 ```bash
 # 1. Create repository on GitHub
 # 2. Connect local repo
-git remote add origin https://github.com/Sneha-Martin18/LEARNOVA.git
+git remote add origin https://github.com/Sneha-Martin18/Learnova.git
 git push -u origin main
 ```
 
@@ -241,7 +241,7 @@ git push origin test-branch
 ```
 Then create PR on GitHub and watch PR checks run.
 
-**Your Repository**: https://github.com/Sneha-Martin18/LEARNOVA
+**Your Repository**: https://github.com/Sneha-Martin18/Learnova
 
 ---
 
@@ -249,7 +249,7 @@ Then create PR on GitHub and watch PR checks run.
 
 ### Priority 1: Connect to GitHub
 ```bash
-git remote add origin https://github.com/Sneha-Martin18/LEARNOVA.git
+git remote add origin https://github.com/Sneha-Martin18/Learnova.git
 git push -u origin main
 ```
 

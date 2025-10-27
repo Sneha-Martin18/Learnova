@@ -48,7 +48,7 @@ if git remote -v | grep -q "origin"; then
     ((TESTS_PASSED++))
 else
     echo -e "${YELLOW}⚠ WARNING${NC}: No Git remote configured"
-    echo "  To fix: git remote add origin https://github.com/Sneha-Martin18/LEARNOVA.git"
+    echo "  To fix: git remote add origin https://github.com/Sneha-Martin18/Learnova.git"
     ((TESTS_FAILED++))
 fi
 echo ""

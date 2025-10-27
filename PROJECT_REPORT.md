@@ -1,7 +1,7 @@
 # Django Student Management System - Project Report
 
 ## Project Overview
-The Django Student Management System is a comprehensive Learning Management System (LEARNOVA) built using Django 3.2.23. It provides a robust platform for managing educational institutions with separate interfaces for administrators, staff, and students.
+The Django Student Management System is a comprehensive Learning Management System (Learnova) built using Django 3.2.23. It provides a robust platform for managing educational institutions with separate interfaces for administrators, staff, and students.
 
 ## Technical Stack
 - **Framework**: Django 3.2.23

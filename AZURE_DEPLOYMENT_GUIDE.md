@@ -2,7 +2,7 @@
 
 ## 🎓 Overview
 
-This guide will help you deploy the LEARNOVA Student Management System to Azure Web App for Containers using the **Azure Student Free Tier**.
+This guide will help you deploy the Learnova Student Management System to Azure Web App for Containers using the **Azure Student Free Tier**.
 
 **What you'll deploy:**
 - Django monolith application
@@ -33,7 +33,7 @@ az login
 ```
 
 ### 3. GitHub Account
-- Your repository: https://github.com/Sneha-Martin18/LEARNOVA
+- Your repository: https://github.com/Sneha-Martin18/Learnova
 
 ---
 
@@ -44,7 +44,7 @@ az login
 #### 1.1 Create Resource Group
 ```bash
 az group create \
-  --name LEARNOVA-rg \
+  --name Learnova-rg \
   --location eastus
 ```
 
@@ -52,17 +52,17 @@ az group create \
 ```bash
 # Create ACR (must be globally unique)
 az acr create \
-  --resource-group LEARNOVA-rg \
-  --name LEARNOVAacr \
+  --resource-group Learnova-rg \
+  --name Learnovaacr \
   --sku Basic \
   --admin-enabled true
 
 # Get ACR credentials
-az acr credential show --name LEARNOVAacr --resource-group LEARNOVA-rg
+az acr credential show --name Learnovaacr --resource-group Learnova-rg
 ```
 
 **Save these values:**
-- Login Server: `LEARNOVAacr.azurecr.io`
+- Login Server: `Learnovaacr.azurecr.io`
 - Username: (from output)
 - Password: (from output)
 
@@ -70,10 +70,10 @@ az acr credential show --name LEARNOVAacr --resource-group LEARNOVA-rg
 ```bash
 # Create PostgreSQL Flexible Server
 az postgres flexible-server create \
-  --resource-group LEARNOVA-rg \
-  --name LEARNOVA-db \
+  --resource-group Learnova-rg \
+  --name Learnova-db \
   --location eastus \
-  --admin-user LEARNOVAadmin \
+  --admin-user Learnovaadmin \
   --admin-password 'YourSecurePassword123!' \
   --sku-name Standard_B1ms \
   --tier Burstable \
@@ -83,15 +83,15 @@ az postgres flexible-server create \
 
 # Create database
 az postgres flexible-server db create \
-  --resource-group LEARNOVA-rg \
-  --server-name LEARNOVA-db \
-  --database-name LEARNOVA_production
+  --resource-group Learnova-rg \
+  --server-name Learnova-db \
+  --database-name Learnova_production
 
 # Get connection string
 az postgres flexible-server show-connection-string \
-  --server-name LEARNOVA-db \
-  --database-name LEARNOVA_production \
-  --admin-user LEARNOVAadmin \
+  --server-name Learnova-db \
+  --database-name Learnova_production \
+  --admin-user Learnovaadmin \
   --admin-password 'YourSecurePassword123!'
 ```
 
@@ -99,8 +99,8 @@ az postgres flexible-server show-connection-string \
 ```bash
 # Create Linux App Service Plan (Free tier)
 az appservice plan create \
-  --name LEARNOVA-plan \
-  --resource-group LEARNOVA-rg \
+  --name Learnova-plan \
+  --resource-group Learnova-rg \
   --is-linux \
   --sku F1
 ```
@@ -109,17 +109,17 @@ az appservice plan create \
 ```bash
 # Create Web App for Containers
 az webapp create \
-  --resource-group LEARNOVA-rg \
-  --plan LEARNOVA-plan \
-  --name LEARNOVA-app \
-  --deployment-container-image-name LEARNOVAacr.azurecr.io/LEARNOVA:latest
+  --resource-group Learnova-rg \
+  --plan Learnova-plan \
+  --name Learnova-app \
+  --deployment-container-image-name Learnovaacr.azurecr.io/Learnova:latest
 
 # Configure ACR credentials
 az webapp config container set \
-  --name LEARNOVA-app \
-  --resource-group LEARNOVA-rg \
-  --docker-custom-image-name LEARNOVAacr.azurecr.io/LEARNOVA:latest \
-  --docker-registry-server-url https://LEARNOVAacr.azurecr.io \
+  --name Learnova-app \
+  --resource-group Learnova-rg \
+  --docker-custom-image-name Learnovaacr.azurecr.io/Learnova:latest \
+  --docker-registry-server-url https://Learnovaacr.azurecr.io \
   --docker-registry-server-user <ACR_USERNAME> \
   --docker-registry-server-password <ACR_PASSWORD>
 ```
@@ -131,14 +131,14 @@ az webapp config container set \
 ```bash
 # Set application settings
 az webapp config appsettings set \
-  --resource-group LEARNOVA-rg \
-  --name LEARNOVA-app \
+  --resource-group Learnova-rg \
+  --name Learnova-app \
   --settings \
     DJANGO_SETTINGS_MODULE=student_management_system.settings \
     SECRET_KEY='your-generated-secret-key-here' \
     DEBUG=False \
-    ALLOWED_HOSTS='LEARNOVA-app.azurewebsites.net' \
-    DATABASE_URL='postgresql://LEARNOVAadmin:YourSecurePassword123!@LEARNOVA-db.postgres.database.azure.com:5432/LEARNOVA_production' \
+    ALLOWED_HOSTS='Learnova-app.azurewebsites.net' \
+    DATABASE_URL='postgresql://Learnovaadmin:YourSecurePassword123!@Learnova-db.postgres.database.azure.com:5432/Learnova_production' \
     WEBSITES_PORT=8000
 ```
 
@@ -152,9 +152,9 @@ az account show --query id --output tsv
 
 # Create service principal (replace {subscription-id} with your ID)
 az ad sp create-for-rbac \
-  --name "LEARNOVA-github-actions" \
+  --name "Learnova-github-actions" \
   --role contributor \
-  --scopes /subscriptions/{subscription-id}/resourceGroups/LEARNOVA-rg \
+  --scopes /subscriptions/{subscription-id}/resourceGroups/Learnova-rg \
   --sdk-auth
 ```
 
@@ -164,17 +164,17 @@ az ad sp create-for-rbac \
 
 ### Step 4: Configure GitHub Secrets
 
-Go to: https://github.com/Sneha-Martin18/LEARNOVA/settings/secrets/actions
+Go to: https://github.com/Sneha-Martin18/Learnova/settings/secrets/actions
 
 Add these secrets:
 
 | Secret Name | Value | How to Get |
 |-------------|-------|------------|
 | `AZURE_CREDENTIALS` | Service principal JSON | From Step 3 |
-| `ACR_LOGIN_SERVER` | `LEARNOVAacr.azurecr.io` | From Step 1.2 |
+| `ACR_LOGIN_SERVER` | `Learnovaacr.azurecr.io` | From Step 1.2 |
 | `ACR_USERNAME` | ACR username | From Step 1.2 |
 | `ACR_PASSWORD` | ACR password | From Step 1.2 |
-| `AZURE_WEBAPP_NAME` | `LEARNOVA-app` | From Step 1.5 |
+| `AZURE_WEBAPP_NAME` | `Learnova-app` | From Step 1.5 |
 
 ---
 
@@ -197,9 +197,9 @@ The GitHub Actions workflow will:
 
 ## 🌐 Access Your Application
 
-**URL:** https://LEARNOVA-app.azurewebsites.net
+**URL:** https://Learnova-app.azurewebsites.net
 
-**Admin Panel:** https://LEARNOVA-app.azurewebsites.net/admin
+**Admin Panel:** https://Learnova-app.azurewebsites.net/admin
 
 ---
 
@@ -220,24 +220,24 @@ The GitHub Actions workflow will:
 
 ### View logs
 ```bash
-az webapp log tail --name LEARNOVA-app --resource-group LEARNOVA-rg
+az webapp log tail --name Learnova-app --resource-group Learnova-rg
 ```
 
 ### Restart app
 ```bash
-az webapp restart --name LEARNOVA-app --resource-group LEARNOVA-rg
+az webapp restart --name Learnova-app --resource-group Learnova-rg
 ```
 
 ### SSH into container
 ```bash
-az webapp ssh --name LEARNOVA-app --resource-group LEARNOVA-rg
+az webapp ssh --name Learnova-app --resource-group Learnova-rg
 ```
 
 ### Update environment variables
 ```bash
 az webapp config appsettings set \
-  --resource-group LEARNOVA-rg \
-  --name LEARNOVA-app \
+  --resource-group Learnova-rg \
+  --name Learnova-app \
   --settings KEY=VALUE
 ```
 
@@ -245,8 +245,8 @@ az webapp config appsettings set \
 ```bash
 # Upgrade to Basic tier (more resources)
 az appservice plan update \
-  --name LEARNOVA-plan \
-  --resource-group LEARNOVA-rg \
+  --name Learnova-plan \
+  --resource-group Learnova-rg \
   --sku B1
 ```
 
@@ -257,23 +257,23 @@ az appservice plan update \
 ### Issue: Container won't start
 ```bash
 # Check logs
-az webapp log tail --name LEARNOVA-app --resource-group LEARNOVA-rg
+az webapp log tail --name Learnova-app --resource-group Learnova-rg
 
 # Check container settings
-az webapp config show --name LEARNOVA-app --resource-group LEARNOVA-rg
+az webapp config show --name Learnova-app --resource-group Learnova-rg
 ```
 
 ### Issue: Database connection fails
 ```bash
 # Check firewall rules
 az postgres flexible-server firewall-rule list \
-  --resource-group LEARNOVA-rg \
-  --name LEARNOVA-db
+  --resource-group Learnova-rg \
+  --name Learnova-db
 
 # Allow Azure services
 az postgres flexible-server firewall-rule create \
-  --resource-group LEARNOVA-rg \
-  --name LEARNOVA-db \
+  --resource-group Learnova-rg \
+  --name Learnova-db \
   --rule-name AllowAzureServices \
   --start-ip-address 0.0.0.0 \
   --end-ip-address 0.0.0.0
@@ -282,12 +282,12 @@ az postgres flexible-server firewall-rule create \
 ### Issue: Application errors
 ```bash
 # View application logs
-az webapp log download --name LEARNOVA-app --resource-group LEARNOVA-rg
+az webapp log download --name Learnova-app --resource-group Learnova-rg
 
 # Enable detailed logging
 az webapp log config \
-  --name LEARNOVA-app \
-  --resource-group LEARNOVA-rg \
+  --name Learnova-app \
+  --resource-group Learnova-rg \
   --docker-container-logging filesystem
 ```
 
@@ -306,8 +306,8 @@ az webapp log config \
 # Create alert for high CPU usage
 az monitor metrics alert create \
   --name high-cpu-alert \
-  --resource-group LEARNOVA-rg \
-  --scopes /subscriptions/{subscription-id}/resourceGroups/LEARNOVA-rg/providers/Microsoft.Web/sites/LEARNOVA-app \
+  --resource-group Learnova-rg \
+  --scopes /subscriptions/{subscription-id}/resourceGroups/Learnova-rg/providers/Microsoft.Web/sites/Learnova-app \
   --condition "avg Percentage CPU > 80" \
   --description "Alert when CPU usage is above 80%"
 ```
@@ -321,16 +321,16 @@ az monitor metrics alert create \
 3. **Enable HTTPS only**
    ```bash
    az webapp update \
-     --resource-group LEARNOVA-rg \
-     --name LEARNOVA-app \
+     --resource-group Learnova-rg \
+     --name Learnova-app \
      --https-only true
    ```
 4. **Restrict database access** to Azure services only
 5. **Regular backups** of database
    ```bash
    az postgres flexible-server backup list \
-     --resource-group LEARNOVA-rg \
-     --name LEARNOVA-db
+     --resource-group Learnova-rg \
+     --name Learnova-db
    ```
 
 ---

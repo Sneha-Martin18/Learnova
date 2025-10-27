@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "=========================================="
-echo "LEARNOVA Project Status Checker"
+echo "Learnova Project Status Checker"
 echo "=========================================="
 echo ""
 

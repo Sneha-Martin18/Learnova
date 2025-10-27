@@ -12,7 +12,7 @@ The deployment process is failing to extract files to the correct location on Az
 
 ## What Was Successfully Completed
 
-1. ✅ Azure Web App created (LEARNOVA-05594)
+1. ✅ Azure Web App created (Learnova-05594)
 2. ✅ Upgraded to B1 tier (quota issue resolved)
 3. ✅ Database uploaded to Azure Storage (332KB)
 4. ✅ Environment variables configured
@@ -64,7 +64,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'LEARNOVA-05594'
+          app-name: 'Learnova-05594'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 ```
 
@@ -77,7 +77,7 @@ jobs:
 ### Option 3: Use Azure Portal Deployment Center
 
 1. Go to Azure Portal
-2. Navigate to LEARNOVA-05594
+2. Navigate to Learnova-05594
 3. Go to Deployment Center
 4. Connect to GitHub repository
 5. Configure automatic deployments
@@ -89,10 +89,10 @@ jobs:
 
 ## Resources Created
 
-- Resource Group: LEARNOVA-rg
-- Web App: LEARNOVA-05594
-- Storage Account: LEARNOVAstatic18774
-- App Service Plan: LEARNOVA-plan (B1)
+- Resource Group: Learnova-rg
+- Web App: Learnova-05594
+- Storage Account: Learnovastatic18774
+- App Service Plan: Learnova-plan (B1)
 
 ## Next Steps
 
@@ -113,7 +113,7 @@ If deployment continues to fail, consider:
 ## Files Ready for Deployment
 
 All code is ready in GitHub:
-- Repository: https://github.com/Sneha-Martin18/LEARNOVA
+- Repository: https://github.com/Sneha-Martin18/Learnova
 - Branch: main
 - Database: Uploaded to Azure Storage
 - Configuration: Complete

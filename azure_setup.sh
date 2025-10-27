@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Azure Deployment Setup Script for Student Free Tier
-# This script automates the creation of Azure resources for LEARNOVA
+# This script automates the creation of Azure resources for Learnova
 
 set -e
 
 echo "=========================================="
-echo "Azure Deployment Setup - LEARNOVA"
+echo "Azure Deployment Setup - Learnova"
 echo "Student Free Tier"
 echo "=========================================="
 echo ""
@@ -47,14 +47,14 @@ echo -e "${BLUE}📊 Subscription ID: $SUBSCRIPTION_ID${NC}"
 echo ""
 
 # Configuration
-RESOURCE_GROUP="LEARNOVA-rg"
+RESOURCE_GROUP="Learnova-rg"
 LOCATION="eastus"
-ACR_NAME="LEARNOVAacr$(date +%s | tail -c 4)"  # Add random suffix for uniqueness
-DB_SERVER_NAME="LEARNOVA-db-$(date +%s | tail -c 4)"
-DB_NAME="LEARNOVA_production"
-DB_ADMIN_USER="LEARNOVAadmin"
-APP_SERVICE_PLAN="LEARNOVA-plan"
-WEB_APP_NAME="LEARNOVA-app-$(date +%s | tail -c 4)"
+ACR_NAME="Learnovaacr$(date +%s | tail -c 4)"  # Add random suffix for uniqueness
+DB_SERVER_NAME="Learnova-db-$(date +%s | tail -c 4)"
+DB_NAME="Learnova_production"
+DB_ADMIN_USER="Learnovaadmin"
+APP_SERVICE_PLAN="Learnova-plan"
+WEB_APP_NAME="Learnova-app-$(date +%s | tail -c 4)"
 
 # Prompt for database password
 echo -e "${YELLOW}🔐 Enter a secure password for PostgreSQL database:${NC}"
@@ -192,7 +192,7 @@ az webapp create \
   --resource-group $RESOURCE_GROUP \
   --plan $APP_SERVICE_PLAN \
   --name $WEB_APP_NAME \
-  --deployment-container-image-name $ACR_LOGIN_SERVER/LEARNOVA:latest \
+  --deployment-container-image-name $ACR_LOGIN_SERVER/Learnova:latest \
   --output table
 
 echo -e "${GREEN}✅ Web App created${NC}"
@@ -202,7 +202,7 @@ echo ""
 az webapp config container set \
   --name $WEB_APP_NAME \
   --resource-group $RESOURCE_GROUP \
-  --docker-custom-image-name $ACR_LOGIN_SERVER/LEARNOVA:latest \
+  --docker-custom-image-name $ACR_LOGIN_SERVER/Learnova:latest \
   --docker-registry-server-url https://$ACR_LOGIN_SERVER \
   --docker-registry-server-user $ACR_USERNAME \
   --docker-registry-server-password $ACR_PASSWORD \
@@ -233,7 +233,7 @@ echo "=========================================="
 echo "Step 7: Creating Service Principal"
 echo "=========================================="
 SP_OUTPUT=$(az ad sp create-for-rbac \
-  --name "LEARNOVA-github-actions-$(date +%s)" \
+  --name "Learnova-github-actions-$(date +%s)" \
   --role contributor \
   --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP \
   --sdk-auth)
@@ -259,7 +259,7 @@ echo "GitHub Secrets Configuration"
 echo "=========================================="
 echo ""
 echo -e "${YELLOW}Add these secrets to GitHub:${NC}"
-echo "https://github.com/Sneha-Martin18/LEARNOVA/settings/secrets/actions"
+echo "https://github.com/Sneha-Martin18/Learnova/settings/secrets/actions"
 echo ""
 echo -e "${GREEN}AZURE_CREDENTIALS:${NC}"
 echo "$SP_OUTPUT"
@@ -285,7 +285,7 @@ echo "   git commit -m 'feat: Add Azure deployment'"
 echo "   git push origin main"
 echo ""
 echo "4. Monitor deployment:"
-echo "   https://github.com/Sneha-Martin18/LEARNOVA/actions"
+echo "   https://github.com/Sneha-Martin18/Learnova/actions"
 echo ""
 echo "5. Access your app:"
 echo "   https://${WEB_APP_NAME}.azurewebsites.net"

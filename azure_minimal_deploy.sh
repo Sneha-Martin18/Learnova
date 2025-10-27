@@ -7,10 +7,10 @@ set -e
 
 # Configuration
 DJANGO_SECRET=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
-RESOURCE_GROUP="LEARNOVA-rg"
+RESOURCE_GROUP="Learnova-rg"
 LOCATION="eastus"
-APP_PLAN="LEARNOVA-plan"
-WEB_APP="LEARNOVA-app-$(date +%s | tail -c 4)"
+APP_PLAN="Learnova-plan"
+WEB_APP="Learnova-app-$(date +%s | tail -c 4)"
 
 echo "🚀 Azure Minimal Deployment (Free Tier)"
 echo ""
@@ -42,7 +42,7 @@ az webapp create \
 az webapp config container set \
   --name $WEB_APP \
   --resource-group $RESOURCE_GROUP \
-  --docker-custom-image-name ghcr.io/sneha-martin18/LEARNOVA:latest \
+  --docker-custom-image-name ghcr.io/sneha-martin18/Learnova:latest \
   --docker-registry-server-url https://ghcr.io \
   --output none
 
@@ -63,7 +63,7 @@ echo "✅ Done"
 # 3. Service Principal
 echo "[3/3] Creating Service Principal..."
 SP_JSON=$(az ad sp create-for-rbac \
-  --name "LEARNOVA-gh-$(date +%s)" \
+  --name "Learnova-gh-$(date +%s)" \
   --role contributor \
   --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP \
   --sdk-auth 2>/dev/null)
@@ -93,7 +93,7 @@ Django Secret: $DJANGO_SECRET
 GitHub Secrets
 ========================================
 
-Add to: https://github.com/Sneha-Martin18/LEARNOVA/settings/secrets/actions
+Add to: https://github.com/Sneha-Martin18/Learnova/settings/secrets/actions
 
 1. AZURE_CREDENTIALS
 $SP_JSON

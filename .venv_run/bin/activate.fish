@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV /home/sneha/Desktop/ogproject/LEARNOVA/.venv_run
+set -gx VIRTUAL_ENV /home/sneha/Desktop/ogproject/Learnova/.venv_run
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"bin $PATH

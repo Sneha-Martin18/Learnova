@@ -72,7 +72,7 @@
                         return result;
 
                     var uppercasedName = firstLetterToUpper(name);
-                    var eLEARNOVAtyle = document.createElement('div')[LEXICON.s];
+                    var eLearnovatyle = document.createElement('div')[LEXICON.s];
                     var resultPossibilities;
                     var i = 0;
                     var v;
@@ -87,7 +87,7 @@
                             firstLetterToUpper(currVendorWithoutDashes) + uppercasedName //WebkitTransition
                         ];
                         for(v = 0; v < resultPossibilities[LEXICON.l]; v++) {
-                            if(eLEARNOVAtyle[resultPossibilities[v]] !== undefined) {
+                            if(eLearnovatyle[resultPossibilities[v]] !== undefined) {
                                 result = resultPossibilities[v];
                                 break;
                             }

@@ -2,7 +2,7 @@
 
 ## ✅ Successfully Deployed
 
-**App URL:** http://LEARNOVA-05594.azurewebsites.net
+**App URL:** http://Learnova-05594.azurewebsites.net
 
 **Status:** Application is running but static files (CSS/JS) are not being served properly.
 
@@ -21,8 +21,8 @@
 The application needs to serve static files properly. Here are the working credentials and next steps:
 
 ### Azure Resources Created:
-- **Resource Group:** `LEARNOVA-rg`
-- **Web App:** `LEARNOVA-05594`
+- **Resource Group:** `Learnova-rg`
+- **Web App:** `Learnova-05594`
 - **Pricing Tier:** Free F1
 - **Runtime:** Python 3.9
 - **Location:** East US
@@ -32,7 +32,7 @@ The application needs to serve static files properly. Here are the working crede
 DJANGO_SETTINGS_MODULE=student_management_system.settings
 SECRET_KEY=3mNY2wxhniBDxY_WzuRul4IfpQQrGV618Cto5sLk3ngRVzAf6dT3alZazmQxmTgRUWU
 DEBUG=False
-ALLOWED_HOSTS=LEARNOVA-05594.azurewebsites.net
+ALLOWED_HOSTS=Learnova-05594.azurewebsites.net
 WEBSITES_PORT=8000
 SCM_DO_BUILD_DURING_DEPLOYMENT=1
 ```
@@ -51,11 +51,11 @@ SCM_DO_BUILD_DURING_DEPLOYMENT=1
 
 ```bash
 az webapp config appsettings set \
-  --resource-group LEARNOVA-rg \
-  --name LEARNOVA-05594 \
+  --resource-group Learnova-rg \
+  --name Learnova-05594 \
   --settings DEBUG=True
 
-az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
+az webapp restart --resource-group Learnova-rg --name Learnova-05594
 ```
 
 This will allow Django to serve static files directly (not recommended for production).
@@ -91,15 +91,15 @@ git archive --format=zip HEAD -o deploy.zip
 
 # Deploy to Azure
 az webapp deploy \
-  --resource-group LEARNOVA-rg \
-  --name LEARNOVA-05594 \
+  --resource-group Learnova-rg \
+  --name Learnova-05594 \
   --src-path deploy.zip \
   --type zip
 
 # Restart app
 az webapp restart \
-  --resource-group LEARNOVA-rg \
-  --name LEARNOVA-05594
+  --resource-group Learnova-rg \
+  --name Learnova-05594
 ```
 
 ---
@@ -123,9 +123,9 @@ az webapp restart \
 ## 📞 Support
 
 For further assistance:
-- Check logs: `az webapp log tail --name LEARNOVA-05594 --resource-group LEARNOVA-rg`
+- Check logs: `az webapp log tail --name Learnova-05594 --resource-group Learnova-rg`
 - View in portal: https://portal.azure.com
-- Diagnostic resources: https://LEARNOVA-05594.scm.azurewebsites.net/detectors
+- Diagnostic resources: https://Learnova-05594.scm.azurewebsites.net/detectors
 
 ---
 
