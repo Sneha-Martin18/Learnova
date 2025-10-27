@@ -8,39 +8,27 @@ from student_management_app.models import CustomUser, AdminHOD
 
 def create_admin():
     try:
-        # Check if admin already exists
-        existing_admin = CustomUser.objects.filter(email="admin@gmail.com").first()
-        if existing_admin:
-            print("Admin user already exists!")
-            print("Email: admin@gmail.com")
-            print("Password: admin@123")
-            return
-        
-        # Create custom user with user_type as string "1" (for HOD/Admin)
+        # Create custom user
         user = CustomUser.objects.create_user(
             username="admin",
             email="admin@gmail.com",
             password="admin@123",
-            user_type="1",  # "1" for HOD/Admin (as string)
+            user_type=1,  # 1 for admin
             first_name="System",
             last_name="Admin"
         )
         
-        # Create AdminHOD profile (required for admin dashboard access)
-        admin_hod = AdminHOD.objects.create(
+        # Create admin profile
+        admin = AdminHOD.objects.create(
             admin=user
         )
         
-        print("✓ Admin user created successfully!")
-        print("✓ AdminHOD profile created!")
+        print("Admin user created successfully!")
         print("Email: admin@gmail.com")
         print("Password: admin@123")
-        print("User Type: 1 (HOD/Admin)")
         
     except Exception as e:
-        print(f"✗ Error creating admin: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        print(f"Error creating admin: {str(e)}")
 
 if __name__ == "__main__":
     create_admin()
