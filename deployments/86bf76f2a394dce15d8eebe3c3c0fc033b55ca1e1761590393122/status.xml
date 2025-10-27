@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<deployment>
+  <id>86bf76f2a394dce15d8eebe3c3c0fc033b55ca1e1761590393122</id>
+  <author>Sneha-Martin18</author>
+  <deployer>GitHub</deployer>
+  <authorEmail />
+  <message>{"type":"Deployment","sha":"86bf76f2a394dce15d8eebe3c3c0fc033b55ca1e","repoName":"Sneha-Martin18/Learnova","actor":"Sneha-Martin18","slotName":"production"}</message>
+  <progress />
+  <status>Success</status>
+  <statusText />
+  <lastSuccessEndTime>2025-10-27T18:39:59.5843602Z</lastSuccessEndTime>
+  <receivedTime>2025-10-27T18:39:59.5843602Z</receivedTime>
+  <startTime>2025-10-27T18:39:59.5843602Z</startTime>
+  <endTime>2025-10-27T18:39:59.5843602Z</endTime>
+  <complete>True</complete>
+  <is_temp>False</is_temp>
+  <is_readonly>True</is_readonly>
+  <buildSummary />
+</deployment>

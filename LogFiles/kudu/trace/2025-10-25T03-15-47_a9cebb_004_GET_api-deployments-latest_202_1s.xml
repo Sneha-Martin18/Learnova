@@ -1,0 +1,9 @@
+<step title="Incoming Request" date="2025-10-25T03:15:47.811" instance="a9cebb" url="/api/deployments/latest" method="GET" type="request" pid="801,1,18" Accept="*/*" Host="learnova-05594.scm.azurewebsites.net" User-Agent="AZURECLI/2.77.0 (DEB)" Accept-Encoding="gzip, deflate" Authorization="Bea..." x-ms-client-request-id="9b7aa5aa-b150-11f0-97ec-4cd577e10d27" X-ARR-LOG-ID="9b7aa5aa-b150-11f0-97ec-4cd577e10d27" CLIENT-IP="14.97.173.201:40696" X-SITE-DEPLOYMENT-ID="learnova-05594" WAS-DEFAULT-HOSTNAME="learnova-05594.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/deployments/latest" X-Client-IP="14.97.173.201" X-Client-Port="40696" >
+  <step title="Cleanup Xml Logs" date="2025-10-25T03:15:47.820" /><!-- duration: 29ms -->
+  <step title="DeploymentService.GetResult" date="2025-10-25T03:15:48.001" >
+    <step title="DeploymentService.GetLatestDeployment" date="2025-10-25T03:15:48.013" >
+      <step title="DeploymentManager.GetResults" date="2025-10-25T03:15:48.023" /><!-- duration: 332ms -->
+    </step><!-- duration: 391ms -->
+  </step><!-- duration: 433ms -->
+  <step title="Outgoing response" date="2025-10-25T03:15:48.616" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 27ms -->
+</step><!-- duration: 844ms -->
