@@ -5,16 +5,16 @@
 set -e
 
 # Configuration
-DB_PASSWORD="LearnovaDB@2024!"
+DB_PASSWORD="LEARNOVADB@2024!"
 DJANGO_SECRET=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
 
-RESOURCE_GROUP="learnova-rg"
+RESOURCE_GROUP="LEARNOVA-rg"
 LOCATION="eastus"
-DB_SERVER="learnova-db-$(date +%s | tail -c 4)"
-DB_NAME="learnova_db"
-DB_USER="learnovaadmin"
-APP_PLAN="learnova-plan"
-WEB_APP="learnova-app-$(date +%s | tail -c 4)"
+DB_SERVER="LEARNOVA-db-$(date +%s | tail -c 4)"
+DB_NAME="LEARNOVA_db"
+DB_USER="LEARNOVAadmin"
+APP_PLAN="LEARNOVA-plan"
+WEB_APP="LEARNOVA-app-$(date +%s | tail -c 4)"
 
 echo "🚀 Starting Azure Deployment..."
 echo ""
@@ -85,7 +85,7 @@ az webapp create \
 az webapp config container set \
   --name $WEB_APP \
   --resource-group $RESOURCE_GROUP \
-  --docker-custom-image-name ghcr.io/sneha-martin18/learnova:latest \
+  --docker-custom-image-name ghcr.io/sneha-martin18/LEARNOVA:latest \
   --docker-registry-server-url https://ghcr.io \
   --output none
 
@@ -107,7 +107,7 @@ echo "✅ Done"
 # 5. Service Principal
 echo "[5/5] Creating Service Principal for GitHub..."
 SP_JSON=$(az ad sp create-for-rbac \
-  --name "learnova-gh-$(date +%s)" \
+  --name "LEARNOVA-gh-$(date +%s)" \
   --role contributor \
   --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP \
   --sdk-auth 2>/dev/null)
@@ -145,7 +145,7 @@ Django Secret: $DJANGO_SECRET
 GitHub Secrets (Add these to GitHub)
 ========================================
 
-Go to: https://github.com/Sneha-Martin18/Learnova/settings/secrets/actions
+Go to: https://github.com/Sneha-Martin18/LEARNOVA/settings/secrets/actions
 
 1. AZURE_CREDENTIALS
 $SP_JSON

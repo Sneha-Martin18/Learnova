@@ -7,7 +7,7 @@ Your system is ready! All tools are installed and configured:
 - ✅ GitHub CLI installed (v2.45.0)
 - ✅ Python installed (v3.12.3)
 - ✅ All scripts exist and are executable
-- ✅ Repository connected to GitHub (Sneha-Martin18/Learnova)
+- ✅ Repository connected to GitHub (Sneha-Martin18/LEARNOVA)
 
 ## ⚠️ Authentication Required
 
@@ -88,17 +88,17 @@ You can also view workflows directly on GitHub:
 
 **Actions Tab:**
 ```
-https://github.com/Sneha-Martin18/Learnova/actions
+https://github.com/Sneha-Martin18/LEARNOVA/actions
 ```
 
 **Workflow Runs:**
 ```
-https://github.com/Sneha-Martin18/Learnova/actions/workflows/ci-cd.yml
+https://github.com/Sneha-Martin18/LEARNOVA/actions/workflows/ci-cd.yml
 ```
 
 ## 📝 Current Status
 
-- **Repository:** Sneha-Martin18/Learnova
+- **Repository:** Sneha-Martin18/LEARNOVA
 - **Tools Status:** All working ✅
 - **Authentication:** Needs refresh ⚠️
 - **Workflow Runs:** Will be visible after authentication

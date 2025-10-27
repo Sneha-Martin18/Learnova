@@ -7,7 +7,7 @@ Your existing SQLite database (332KB) has been uploaded to Azure Blob Storage.
 ## What Was Done
 
 1. Database Uploaded to Azure Storage
-   - Storage Account: learnovastatic18774
+   - Storage Account: LEARNOVAstatic18774
    - Container: database
    - File: db.sqlite3
    - Size: 332KB
@@ -39,23 +39,23 @@ All existing data preserved:
 Once Azure services stabilize, restart the app:
 
 ```bash
-az webapp restart --resource-group learnova-rg --name learnova-05594
+az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
 ```
 
-Then visit: http://learnova-05594.azurewebsites.net
+Then visit: http://LEARNOVA-05594.azurewebsites.net
 
 ## Database Backup Locations
 
 1. Local: db.sqlite3 in project directory
-2. Azure Storage: https://learnovastatic18774.blob.core.windows.net/database/db.sqlite3
+2. Azure Storage: https://LEARNOVAstatic18774.blob.core.windows.net/database/db.sqlite3
 
 ## Update Database
 
 To upload changes:
 
 ```bash
-az storage blob upload --account-name learnovastatic18774 --container-name database --name db.sqlite3 --file db.sqlite3 --overwrite
-az webapp restart --resource-group learnova-rg --name learnova-05594
+az storage blob upload --account-name LEARNOVAstatic18774 --container-name database --name db.sqlite3 --file db.sqlite3 --overwrite
+az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
 ```
 
 ## Status

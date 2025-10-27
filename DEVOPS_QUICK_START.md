@@ -152,7 +152,7 @@ Infrastructure:
 ### View in GitHub
 
 ```
-https://github.com/Sneha-Martin18/Learnova/actions
+https://github.com/Sneha-Martin18/LEARNOVA/actions
 ```
 
 ### Check Status via CLI
@@ -338,7 +338,7 @@ Automated in CI/CD:
 ---
 
 **Quick Links:**
-- [GitHub Actions](https://github.com/Sneha-Martin18/Learnova/actions)
-- [Repository](https://github.com/Sneha-Martin18/Learnova)
-- [Issues](https://github.com/Sneha-Martin18/Learnova/issues)
-- [Pull Requests](https://github.com/Sneha-Martin18/Learnova/pulls)
+- [GitHub Actions](https://github.com/Sneha-Martin18/LEARNOVA/actions)
+- [Repository](https://github.com/Sneha-Martin18/LEARNOVA)
+- [Issues](https://github.com/Sneha-Martin18/LEARNOVA/issues)
+- [Pull Requests](https://github.com/Sneha-Martin18/LEARNOVA/pulls)

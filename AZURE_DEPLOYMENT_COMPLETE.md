@@ -8,12 +8,12 @@ Your Django Student Management System has been deployed to Azure, but requires f
 
 ## 🌐 Application Details
 
-**URL:** http://learnova-05594.azurewebsites.net
+**URL:** http://LEARNOVA-05594.azurewebsites.net
 
 **Status:** Application deployed but currently showing errors due to Azure service issues
 
-**Resource Group:** `learnova-rg`  
-**Web App Name:** `learnova-05594`  
+**Resource Group:** `LEARNOVA-rg`  
+**Web App Name:** `LEARNOVA-05594`  
 **Location:** East US  
 **Pricing Tier:** Free F1 (Student tier)
 
@@ -35,13 +35,13 @@ Your Django Student Management System has been deployed to Azure, but requires f
 ## 🔧 Azure Resources Created
 
 ### 1. Web App
-- **Name:** learnova-05594
+- **Name:** LEARNOVA-05594
 - **Runtime:** Python 3.9
 - **Server:** Gunicorn
 - **Port:** 8000
 
 ### 2. Storage Account
-- **Name:** learnovastatic18774
+- **Name:** LEARNOVAstatic18774
 - **Container:** static
 - **Purpose:** Serving CSS, JavaScript, images
 
@@ -50,10 +50,10 @@ Your Django Student Management System has been deployed to Azure, but requires f
 DJANGO_SETTINGS_MODULE=student_management_system.settings
 SECRET_KEY=3mNY2wxhniBDxY_WzuRul4IfpQQrGV618Cto5sLk3ngRVzAf6dT3alZazmQxmTgRUWU
 DEBUG=True
-ALLOWED_HOSTS=learnova-05594.azurewebsites.net
+ALLOWED_HOSTS=LEARNOVA-05594.azurewebsites.net
 WEBSITES_PORT=8000
 SCM_DO_BUILD_DURING_DEPLOYMENT=1
-AZURE_ACCOUNT_NAME=learnovastatic18774
+AZURE_ACCOUNT_NAME=LEARNOVAstatic18774
 AZURE_ACCOUNT_KEY=[configured]
 ```
 
@@ -66,10 +66,10 @@ AZURE_ACCOUNT_KEY=[configured]
 Azure is experiencing temporary service issues. Wait 30-60 minutes and try:
 
 ```bash
-az webapp restart --resource-group learnova-rg --name learnova-05594
+az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
 ```
 
-Then visit: http://learnova-05594.azurewebsites.net
+Then visit: http://LEARNOVA-05594.azurewebsites.net
 
 ### Option 2: Verify Deployment
 
@@ -77,13 +77,13 @@ Once Azure services are restored, run:
 
 ```bash
 # Check app status
-az webapp show --resource-group learnova-rg --name learnova-05594 --query "state"
+az webapp show --resource-group LEARNOVA-rg --name LEARNOVA-05594 --query "state"
 
 # View logs
-az webapp log tail --resource-group learnova-rg --name learnova-05594
+az webapp log tail --resource-group LEARNOVA-rg --name LEARNOVA-05594
 
 # Test the app
-curl -I http://learnova-05594.azurewebsites.net
+curl -I http://LEARNOVA-05594.azurewebsites.net
 ```
 
 ### Option 3: Collect Static Files to Azure Blob
@@ -92,7 +92,7 @@ Once the app is running, upload static files:
 
 ```bash
 # SSH into the app
-az webapp ssh --resource-group learnova-rg --name learnova-05594
+az webapp ssh --resource-group LEARNOVA-rg --name LEARNOVA-05594
 
 # Run collectstatic
 python manage.py collectstatic --noinput
@@ -122,15 +122,15 @@ python manage.py collectstatic --noinput
 
 ### Azure Portal
 - URL: https://portal.azure.com
-- Navigate to: Resource Groups → learnova-rg → learnova-05594
+- Navigate to: Resource Groups → LEARNOVA-rg → LEARNOVA-05594
 
 ### Storage Account
-- Name: learnovastatic18774
+- Name: LEARNOVAstatic18774
 - Container: static
 - Access: Public blob access enabled
 
 ### GitHub Repository
-- URL: https://github.com/Sneha-Martin18/Learnova
+- URL: https://github.com/Sneha-Martin18/LEARNOVA
 - Branch: main
 - Latest commit: Azure Blob Storage configuration
 
@@ -154,29 +154,29 @@ python manage.py collectstatic --noinput
 
 1. **Check logs:**
    ```bash
-   az webapp log tail --resource-group learnova-rg --name learnova-05594
+   az webapp log tail --resource-group LEARNOVA-rg --name LEARNOVA-05594
    ```
 
 2. **Restart the app:**
    ```bash
-   az webapp restart --resource-group learnova-rg --name learnova-05594
+   az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
    ```
 
 3. **Verify environment variables:**
    ```bash
-   az webapp config appsettings list --resource-group learnova-rg --name learnova-05594
+   az webapp config appsettings list --resource-group LEARNOVA-rg --name LEARNOVA-05594
    ```
 
 ### If static files don't load:
 
 1. **Check Azure Storage:**
    ```bash
-   az storage blob list --account-name learnovastatic18774 --container-name static --output table
+   az storage blob list --account-name LEARNOVAstatic18774 --container-name static --output table
    ```
 
 2. **Manually collect static files:**
    ```bash
-   az webapp ssh --resource-group learnova-rg --name learnova-05594
+   az webapp ssh --resource-group LEARNOVA-rg --name LEARNOVA-05594
    python manage.py collectstatic --noinput
    ```
 
@@ -195,15 +195,15 @@ git archive --format=zip HEAD -o deploy.zip
 
 # Deploy to Azure
 az webapp deploy \
-  --resource-group learnova-rg \
-  --name learnova-05594 \
+  --resource-group LEARNOVA-rg \
+  --name LEARNOVA-05594 \
   --src-path deploy.zip \
   --type zip
 
 # Restart app
 az webapp restart \
-  --resource-group learnova-rg \
-  --name learnova-05594
+  --resource-group LEARNOVA-rg \
+  --name LEARNOVA-05594
 ```
 
 ---
@@ -212,22 +212,22 @@ az webapp restart \
 
 ### View Real-time Logs
 ```bash
-az webapp log tail --resource-group learnova-rg --name learnova-05594
+az webapp log tail --resource-group LEARNOVA-rg --name LEARNOVA-05594
 ```
 
 ### Download Logs
 ```bash
 az webapp log download \
-  --resource-group learnova-rg \
-  --name learnova-05594 \
+  --resource-group LEARNOVA-rg \
+  --name LEARNOVA-05594 \
   --log-file app_logs.zip
 ```
 
 ### Enable Detailed Logging
 ```bash
 az webapp log config \
-  --resource-group learnova-rg \
-  --name learnova-05594 \
+  --resource-group LEARNOVA-rg \
+  --name LEARNOVA-05594 \
   --docker-container-logging filesystem \
   --level verbose
 ```
@@ -274,24 +274,24 @@ az webapp log config \
 
 1. **Restart the application:**
    ```bash
-   az webapp restart --resource-group learnova-rg --name learnova-05594
+   az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
    ```
 
 2. **Collect static files:**
    ```bash
-   az webapp ssh --resource-group learnova-rg --name learnova-05594
+   az webapp ssh --resource-group LEARNOVA-rg --name LEARNOVA-05594
    python manage.py collectstatic --noinput
    exit
    ```
 
 3. **Test the application:**
-   - Visit: http://learnova-05594.azurewebsites.net
+   - Visit: http://LEARNOVA-05594.azurewebsites.net
    - Login page should display with full styling
    - All CSS, JavaScript, and images should load
 
 4. **Create admin user (if needed):**
    ```bash
-   az webapp ssh --resource-group learnova-rg --name learnova-05594
+   az webapp ssh --resource-group LEARNOVA-rg --name LEARNOVA-05594
    python manage.py createsuperuser
    exit
    ```

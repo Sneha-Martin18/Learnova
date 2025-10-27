@@ -33,7 +33,7 @@ Your repository has no remote configured, which means:
 
 **Fix**: Connect to GitHub repository
 ```bash
-git remote add origin https://github.com/Sneha-Martin18/Learnova.git
+git remote add origin https://github.com/Sneha-Martin18/LEARNOVA.git
 git push -u origin main
 ```
 
@@ -169,7 +169,7 @@ docker compose down
 
 - [ ] **2.2** Connect local repo to GitHub
   ```bash
-  git remote add origin https://github.com/Sneha-Martin18/Learnova.git
+  git remote add origin https://github.com/Sneha-Martin18/LEARNOVA.git
   git branch -M main
   git push -u origin main
   ```
@@ -343,7 +343,7 @@ cd microservices
 docker compose build
 
 # 5. Connect to GitHub
-git remote add origin https://github.com/Sneha-Martin18/Learnova.git
+git remote add origin https://github.com/Sneha-Martin18/LEARNOVA.git
 git push -u origin main
 ```
 

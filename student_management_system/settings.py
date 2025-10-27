@@ -16,7 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://Learnova-c3gnarhvgabjf5.centralus-01.azurewebsites.net/'
+    'https://LEARNOVA-c3gnarhvgabjf5.centralus-01.azurewebsites.net/'
 ]
 
 # Application definition

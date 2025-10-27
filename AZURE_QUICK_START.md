@@ -39,7 +39,7 @@ chmod +x azure_setup.sh
 
 After the script completes, add these secrets to GitHub:
 
-**Go to:** https://github.com/Sneha-Martin18/Learnova/settings/secrets/actions
+**Go to:** https://github.com/Sneha-Martin18/LEARNOVA/settings/secrets/actions
 
 **Click:** "New repository secret" for each:
 
@@ -58,13 +58,13 @@ git commit -m "feat: Add Azure deployment"
 git push origin main
 ```
 
-Watch deployment at: https://github.com/Sneha-Martin18/Learnova/actions
+Watch deployment at: https://github.com/Sneha-Martin18/LEARNOVA/actions
 
 ---
 
 ## Step 5: Access Your App
 
-**URL:** https://learnova-app.azurewebsites.net
+**URL:** https://LEARNOVA-app.azurewebsites.net
 
 ---
 
@@ -85,11 +85,11 @@ See full guide: `AZURE_DEPLOYMENT_GUIDE.md`
 
 ## 📋 What Gets Created
 
-- ✅ Resource Group: `learnova-rg`
-- ✅ Container Registry: `learnovaacr`
-- ✅ PostgreSQL Database: `learnova-db`
-- ✅ App Service Plan: `learnova-plan` (Free tier)
-- ✅ Web App: `learnova-app`
+- ✅ Resource Group: `LEARNOVA-rg`
+- ✅ Container Registry: `LEARNOVAacr`
+- ✅ PostgreSQL Database: `LEARNOVA-db`
+- ✅ App Service Plan: `LEARNOVA-plan` (Free tier)
+- ✅ Web App: `LEARNOVA-app`
 
 ---
 

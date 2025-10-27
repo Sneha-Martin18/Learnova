@@ -25,8 +25,8 @@
    - Click "Create"
 
 3. **Configure:**
-   - **Resource Group:** `learnova-rg` (create new)
-   - **Name:** `learnova-app` (must be unique)
+   - **Resource Group:** `LEARNOVA-rg` (create new)
+   - **Name:** `LEARNOVA-app` (must be unique)
    - **Publish:** Container
    - **Operating System:** Linux
    - **Region:** East US
@@ -34,7 +34,7 @@
 
 4. **Container Settings:**
    - **Image Source:** Other Container Registries
-   - **Image:** `ghcr.io/sneha-martin18/learnova:latest`
+   - **Image:** `ghcr.io/sneha-martin18/LEARNOVA:latest`
    - **Registry:** `https://ghcr.io`
 
 5. **Click:** Review + Create → Create
@@ -53,7 +53,7 @@
 DJANGO_SETTINGS_MODULE = student_management_system.settings
 SECRET_KEY = your-secret-key-here
 DEBUG = False
-ALLOWED_HOSTS = learnova-app.azurewebsites.net
+ALLOWED_HOSTS = LEARNOVA-app.azurewebsites.net
 WEBSITES_PORT = 8000
 ```
 
@@ -72,7 +72,7 @@ WEBSITES_PORT = 8000
 
 #### 3.2 Add GitHub Secret
 
-1. Go to: https://github.com/Sneha-Martin18/Learnova/settings/secrets/actions
+1. Go to: https://github.com/Sneha-Martin18/LEARNOVA/settings/secrets/actions
 2. Click **New repository secret**
 3. Name: `AZURE_WEBAPP_PUBLISH_PROFILE`
 4. Value: Paste the XML content
@@ -84,7 +84,7 @@ The workflow is already created at `.github/workflows/azure-deploy.yml`
 
 Just update line 9:
 ```yaml
-AZURE_WEBAPP_NAME: learnova-app  # Change to your actual app name
+AZURE_WEBAPP_NAME: LEARNOVA-app  # Change to your actual app name
 ```
 
 ---
@@ -97,13 +97,13 @@ git commit -m "feat: Deploy to Azure Web App"
 git push origin main
 ```
 
-Watch deployment at: https://github.com/Sneha-Martin18/Learnova/actions
+Watch deployment at: https://github.com/Sneha-Martin18/LEARNOVA/actions
 
 ---
 
 ### Step 5: Access Your App
 
-**URL:** https://learnova-app.azurewebsites.net
+**URL:** https://LEARNOVA-app.azurewebsites.net
 
 ---
 
@@ -116,31 +116,31 @@ If you prefer command line:
 az login
 
 # Create resource group
-az group create --name learnova-rg --location eastus
+az group create --name LEARNOVA-rg --location eastus
 
 # Create app service plan (Free tier)
 az appservice plan create \
-  --name learnova-plan \
-  --resource-group learnova-rg \
+  --name LEARNOVA-plan \
+  --resource-group LEARNOVA-rg \
   --is-linux \
   --sku F1
 
 # Create web app
 az webapp create \
-  --resource-group learnova-rg \
-  --plan learnova-plan \
-  --name learnova-app \
-  --deployment-container-image-name ghcr.io/sneha-martin18/learnova:latest
+  --resource-group LEARNOVA-rg \
+  --plan LEARNOVA-plan \
+  --name LEARNOVA-app \
+  --deployment-container-image-name ghcr.io/sneha-martin18/LEARNOVA:latest
 
 # Configure environment
 az webapp config appsettings set \
-  --resource-group learnova-rg \
-  --name learnova-app \
+  --resource-group LEARNOVA-rg \
+  --name LEARNOVA-app \
   --settings \
     DJANGO_SETTINGS_MODULE=student_management_system.settings \
     SECRET_KEY="your-secret-key" \
     DEBUG=False \
-    ALLOWED_HOSTS="learnova-app.azurewebsites.net" \
+    ALLOWED_HOSTS="LEARNOVA-app.azurewebsites.net" \
     WEBSITES_PORT=8000
 ```
 
@@ -176,10 +176,10 @@ The workflow (`.github/workflows/azure-deploy.yml`) will:
 ```bash
 # Create PostgreSQL
 az postgres flexible-server create \
-  --resource-group learnova-rg \
-  --name learnova-db \
+  --resource-group LEARNOVA-rg \
+  --name LEARNOVA-db \
   --location eastus \
-  --admin-user learnovaadmin \
+  --admin-user LEARNOVAadmin \
   --admin-password "YourPassword123!" \
   --sku-name Standard_B1ms \
   --tier Burstable \
@@ -189,16 +189,16 @@ az postgres flexible-server create \
 
 # Create database
 az postgres flexible-server db create \
-  --resource-group learnova-rg \
-  --server-name learnova-db \
-  --database-name learnova_db
+  --resource-group LEARNOVA-rg \
+  --server-name LEARNOVA-db \
+  --database-name LEARNOVA_db
 
 # Update app settings
 az webapp config appsettings set \
-  --resource-group learnova-rg \
-  --name learnova-app \
+  --resource-group LEARNOVA-rg \
+  --name LEARNOVA-app \
   --settings \
-    DATABASE_URL="postgresql://learnovaadmin:YourPassword123!@learnova-db.postgres.database.azure.com:5432/learnova_db"
+    DATABASE_URL="postgresql://LEARNOVAadmin:YourPassword123!@LEARNOVA-db.postgres.database.azure.com:5432/LEARNOVA_db"
 ```
 
 ---
@@ -208,18 +208,18 @@ az webapp config appsettings set \
 ### App won't start
 ```bash
 # View logs
-az webapp log tail --name learnova-app --resource-group learnova-rg
+az webapp log tail --name LEARNOVA-app --resource-group LEARNOVA-rg
 
 # Enable logging
 az webapp log config \
-  --name learnova-app \
-  --resource-group learnova-rg \
+  --name LEARNOVA-app \
+  --resource-group LEARNOVA-rg \
   --docker-container-logging filesystem
 ```
 
 ### Container image not found
 - Make sure GitHub Actions ran successfully
-- Check image exists: https://github.com/Sneha-Martin18/Learnova/pkgs/container/learnova
+- Check image exists: https://github.com/Sneha-Martin18/LEARNOVA/pkgs/container/LEARNOVA
 - Verify container registry URL in Azure
 
 ### Port issues
@@ -243,7 +243,7 @@ az webapp log config \
 **Set up budget alert:**
 ```bash
 az consumption budget create \
-  --budget-name learnova-budget \
+  --budget-name LEARNOVA-budget \
   --amount 20 \
   --time-grain Monthly \
   --start-date 2025-01-01 \

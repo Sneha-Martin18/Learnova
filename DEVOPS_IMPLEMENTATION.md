@@ -1,8 +1,8 @@
-# DevOps Implementation Guide - Learnova Student Management System
+# DevOps Implementation Guide - LEARNOVA Student Management System
 
 ## 🎯 Overview
 
-This document describes the complete DevOps CI/CD implementation for the Learnova Student Management System, a microservices-based application built with Django and Flask.
+This document describes the complete DevOps CI/CD implementation for the LEARNOVA Student Management System, a microservices-based application built with Django and Flask.
 
 ---
 
@@ -347,7 +347,7 @@ deploy-staging:
   if: github.ref == 'refs/heads/develop'
   environment:
     name: staging
-    url: https://staging.learnova.com
+    url: https://staging.LEARNOVA.com
 ```
 
 ### Production Deployment
@@ -359,7 +359,7 @@ deploy-production:
   if: github.ref == 'refs/heads/main'
   environment:
     name: production
-    url: https://learnova.com
+    url: https://LEARNOVA.com
 ```
 
 ### Deployment Steps
@@ -386,8 +386,8 @@ deploy-production:
 
 ```bash
 # Clone repository
-git clone https://github.com/Sneha-Martin18/Learnova.git
-cd Learnova
+git clone https://github.com/Sneha-Martin18/LEARNOVA.git
+cd LEARNOVA
 
 # Start microservices
 cd microservices

@@ -7,7 +7,7 @@
    - Sign in with your Azure account
 
 2. **Navigate to Your Web App**
-   - Search for "learnova-05594" in the top search bar
+   - Search for "LEARNOVA-05594" in the top search bar
    - Click on your web app
 
 3. **Open SSH/Console**
@@ -32,7 +32,7 @@
    - Wait 30 seconds
 
 7. **Test**
-   - Visit: http://learnova-05594.azurewebsites.net
+   - Visit: http://LEARNOVA-05594.azurewebsites.net
    - The page should now have full styling (colors, buttons, layout)
 
 ---
@@ -41,7 +41,7 @@
 
 ```bash
 # Open a tunnel
-az webapp create-remote-connection --resource-group learnova-rg --name learnova-05594
+az webapp create-remote-connection --resource-group LEARNOVA-rg --name LEARNOVA-05594
 
 # In another terminal, when you see the port number (e.g., 42389):
 ssh root@127.0.0.1 -p 42389
@@ -73,6 +73,6 @@ After this, your login page will have:
 
 ## Current Status
 
-- App URL: http://learnova-05594.azurewebsites.net
+- App URL: http://LEARNOVA-05594.azurewebsites.net
 - Status: Running (unstyled)
 - Action: Run collectstatic via Azure Portal SSH

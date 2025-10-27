@@ -6,18 +6,18 @@
 set -e
 
 # Configuration - EDIT THESE VALUES
-DB_ADMIN_PASSWORD="LearnovaDB@2024!"  # Change this to your preferred password
+DB_ADMIN_PASSWORD="LEARNOVADB@2024!"  # Change this to your preferred password
 DJANGO_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))" 2>/dev/null || echo "django-insecure-$(date +%s)-change-this-in-production")
 
 # Resource names
-RESOURCE_GROUP="learnova-rg"
+RESOURCE_GROUP="LEARNOVA-rg"
 LOCATION="eastus"
-ACR_NAME="learnovaacr$(date +%s | tail -c 4)"
-DB_SERVER_NAME="learnova-db-$(date +%s | tail -c 4)"
-DB_NAME="learnova_production"
-DB_ADMIN_USER="learnovaadmin"
-APP_SERVICE_PLAN="learnova-plan"
-WEB_APP_NAME="learnova-app-$(date +%s | tail -c 4)"
+ACR_NAME="LEARNOVAacr$(date +%s | tail -c 4)"
+DB_SERVER_NAME="LEARNOVA-db-$(date +%s | tail -c 4)"
+DB_NAME="LEARNOVA_production"
+DB_ADMIN_USER="LEARNOVAadmin"
+APP_SERVICE_PLAN="LEARNOVA-plan"
+WEB_APP_NAME="LEARNOVA-app-$(date +%s | tail -c 4)"
 
 echo "=========================================="
 echo "Azure Automated Deployment"
@@ -119,7 +119,7 @@ az webapp create \
   --resource-group $RESOURCE_GROUP \
   --plan $APP_SERVICE_PLAN \
   --name $WEB_APP_NAME \
-  --deployment-container-image-name $ACR_LOGIN_SERVER/learnova:latest \
+  --deployment-container-image-name $ACR_LOGIN_SERVER/LEARNOVA:latest \
   --output none
 echo "✅ Web App created"
 
@@ -127,7 +127,7 @@ echo "✅ Web App created"
 az webapp config container set \
   --name $WEB_APP_NAME \
   --resource-group $RESOURCE_GROUP \
-  --docker-custom-image-name $ACR_LOGIN_SERVER/learnova:latest \
+  --docker-custom-image-name $ACR_LOGIN_SERVER/LEARNOVA:latest \
   --docker-registry-server-url https://$ACR_LOGIN_SERVER \
   --docker-registry-server-user $ACR_USERNAME \
   --docker-registry-server-password $ACR_PASSWORD \
@@ -152,7 +152,7 @@ echo "✅ Environment variables configured"
 # 7. Service Principal
 echo "7/7 Creating Service Principal..."
 SP_OUTPUT=$(az ad sp create-for-rbac \
-  --name "learnova-github-$(date +%s)" \
+  --name "LEARNOVA-github-$(date +%s)" \
   --role contributor \
   --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP \
   --sdk-auth 2>/dev/null)
@@ -176,7 +176,7 @@ echo "=========================================="
 echo "GitHub Secrets - Add to Repository"
 echo "=========================================="
 echo ""
-echo "Go to: https://github.com/Sneha-Martin18/Learnova/settings/secrets/actions"
+echo "Go to: https://github.com/Sneha-Martin18/LEARNOVA/settings/secrets/actions"
 echo ""
 echo "Add these secrets:"
 echo ""

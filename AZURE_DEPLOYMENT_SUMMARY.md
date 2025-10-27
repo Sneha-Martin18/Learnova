@@ -2,7 +2,7 @@
 
 ## Current Status: DEPLOYMENT INCOMPLETE
 
-**URL:** http://learnova-05594.azurewebsites.net  
+**URL:** http://LEARNOVA-05594.azurewebsites.net  
 **Status:** 503 Service Unavailable - Files not deployed
 
 ---
@@ -10,13 +10,13 @@
 ## What Has Been Completed
 
 ### 1. Azure Infrastructure ✅
-- **Web App:** learnova-05594 (Running)
+- **Web App:** LEARNOVA-05594 (Running)
 - **Pricing Tier:** B1 Basic (~$13/month, covered by student credits)
 - **Location:** East US
 - **Runtime:** Python 3.9
 
 ### 2. Storage & Database ✅
-- **Storage Account:** learnovastatic18774
+- **Storage Account:** LEARNOVAstatic18774
 - **Database:** Uploaded to Azure Storage (332KB)
 - **Static Files Container:** Created and configured
 
@@ -27,7 +27,7 @@
 - Build settings configured
 
 ### 4. Code Repository ✅
-- GitHub: https://github.com/Sneha-Martin18/Learnova
+- GitHub: https://github.com/Sneha-Martin18/LEARNOVA
 - Branch: main
 - All code committed and pushed
 
@@ -62,8 +62,8 @@ python: can't open file '/home/site/wwwroot/manage.py': [Errno 2] No such file o
 
 2. **Navigate to Web App**
    - Click "Resource groups" in left menu
-   - Click "learnova-rg"
-   - Click "learnova-05594"
+   - Click "LEARNOVA-rg"
+   - Click "LEARNOVA-05594"
 
 3. **Configure Deployment**
    - In left menu, click "Deployment Center"
@@ -71,7 +71,7 @@ python: can't open file '/home/site/wwwroot/manage.py': [Errno 2] No such file o
    - Source: Select "GitHub"
    - Click "Authorize" and sign in to GitHub
    - Organization: Sneha-Martin18
-   - Repository: Learnova
+   - Repository: LEARNOVA
    - Branch: main
    - Click "Save"
 
@@ -81,7 +81,7 @@ python: can't open file '/home/site/wwwroot/manage.py': [Errno 2] No such file o
    - Status should show "Success"
 
 5. **Verify**
-   - Visit: http://learnova-05594.azurewebsites.net
+   - Visit: http://LEARNOVA-05594.azurewebsites.net
    - Should show login page with styling
 
 #### Option 2: VS Code Azure Extension
@@ -90,7 +90,7 @@ python: can't open file '/home/site/wwwroot/manage.py': [Errno 2] No such file o
 2. Sign in to Azure
 3. Right-click on project folder
 4. Select "Deploy to Web App"
-5. Choose "learnova-05594"
+5. Choose "LEARNOVA-05594"
 6. Confirm deployment
 
 #### Option 3: Manual FTP Upload
@@ -115,10 +115,10 @@ If automated deployment fails, use FTP:
 DJANGO_SETTINGS_MODULE=student_management_system.settings
 SECRET_KEY=3mNY2wxhniBDxY_WzuRul4IfpQQrGV618Cto5sLk3ngRVzAf6dT3alZazmQxmTgRUWU
 DEBUG=True
-ALLOWED_HOSTS=learnova-05594.azurewebsites.net
+ALLOWED_HOSTS=LEARNOVA-05594.azurewebsites.net
 WEBSITES_PORT=8000
 SCM_DO_BUILD_DURING_DEPLOYMENT=true
-AZURE_ACCOUNT_NAME=learnovastatic18774
+AZURE_ACCOUNT_NAME=LEARNOVAstatic18774
 AZURE_ACCOUNT_KEY=[configured]
 ```
 
@@ -132,7 +132,7 @@ python manage.py migrate --noinput && gunicorn --bind=0.0.0.0:8000 --timeout 600
 ## Database Access
 
 Your database is stored in Azure Blob Storage:
-- **URL:** https://learnovastatic18774.blob.core.windows.net/database/db.sqlite3
+- **URL:** https://LEARNOVAstatic18774.blob.core.windows.net/database/db.sqlite3
 - **Auto-download:** Configured in startup.sh
 - **Size:** 332KB
 - **Contents:** All users, courses, attendance, grades
@@ -159,17 +159,17 @@ Your database is stored in Azure Blob Storage:
 
 1. **Check logs:**
    ```bash
-   az webapp log tail --resource-group learnova-rg --name learnova-05594
+   az webapp log tail --resource-group LEARNOVA-rg --name LEARNOVA-05594
    ```
 
 2. **Restart app:**
    ```bash
-   az webapp restart --resource-group learnova-rg --name learnova-05594
+   az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
    ```
 
 3. **Verify files exist:**
    ```bash
-   az webapp ssh --resource-group learnova-rg --name learnova-05594
+   az webapp ssh --resource-group LEARNOVA-rg --name LEARNOVA-05594
    ls -la /home/site/wwwroot
    ```
 
@@ -177,12 +177,12 @@ Your database is stored in Azure Blob Storage:
 
 1. **Run collectstatic:**
    ```bash
-   az webapp ssh --resource-group learnova-rg --name learnova-05594
+   az webapp ssh --resource-group LEARNOVA-rg --name LEARNOVA-05594
    python manage.py collectstatic --noinput
    ```
 
 2. **Check Azure Storage:**
-   - Files should upload to learnovastatic18774/static/
+   - Files should upload to LEARNOVAstatic18774/static/
 
 ---
 
@@ -190,19 +190,19 @@ Your database is stored in Azure Blob Storage:
 
 ```bash
 # Check app status
-az webapp show --resource-group learnova-rg --name learnova-05594 --query "state"
+az webapp show --resource-group LEARNOVA-rg --name LEARNOVA-05594 --query "state"
 
 # View logs
-az webapp log tail --resource-group learnova-rg --name learnova-05594
+az webapp log tail --resource-group LEARNOVA-rg --name LEARNOVA-05594
 
 # Restart app
-az webapp restart --resource-group learnova-rg --name learnova-05594
+az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
 
 # SSH into app
-az webapp ssh --resource-group learnova-rg --name learnova-05594
+az webapp ssh --resource-group LEARNOVA-rg --name LEARNOVA-05594
 
 # Test app
-curl -I http://learnova-05594.azurewebsites.net
+curl -I http://LEARNOVA-05594.azurewebsites.net
 ```
 
 ---
@@ -220,10 +220,10 @@ curl -I http://learnova-05594.azurewebsites.net
 
 | Resource | Name | Type | Status |
 |----------|------|------|--------|
-| Resource Group | learnova-rg | Container | ✅ Active |
-| Web App | learnova-05594 | App Service | ✅ Running |
-| App Service Plan | learnova-plan | B1 Basic | ✅ Active |
-| Storage Account | learnovastatic18774 | Standard LRS | ✅ Active |
+| Resource Group | LEARNOVA-rg | Container | ✅ Active |
+| Web App | LEARNOVA-05594 | App Service | ✅ Running |
+| App Service Plan | LEARNOVA-plan | B1 Basic | ✅ Active |
+| Storage Account | LEARNOVAstatic18774 | Standard LRS | ✅ Active |
 | Database Container | database | Blob Container | ✅ Active |
 | Static Container | static | Blob Container | ✅ Active |
 

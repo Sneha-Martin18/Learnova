@@ -30,18 +30,18 @@ The app is showing "Application Error" after deployment.
 ### Option 1: Enable Always On (Recommended)
 
 ```bash
-az webapp config set --resource-group learnova-rg --name learnova-05594 --always-on true
-az webapp restart --resource-group learnova-rg --name learnova-05594
+az webapp config set --resource-group LEARNOVA-rg --name LEARNOVA-05594 --always-on true
+az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
 ```
 
 ### Option 2: Check Application Logs
 
 ```bash
 # Enable detailed logging
-az webapp log config --resource-group learnova-rg --name learnova-05594 --application-logging filesystem --level verbose
+az webapp log config --resource-group LEARNOVA-rg --name LEARNOVA-05594 --application-logging filesystem --level verbose
 
 # View logs
-az webapp log tail --resource-group learnova-rg --name learnova-05594
+az webapp log tail --resource-group LEARNOVA-rg --name LEARNOVA-05594
 ```
 
 ### Option 3: Simplify Startup
@@ -49,8 +49,8 @@ az webapp log tail --resource-group learnova-rg --name learnova-05594
 Remove database download complexity temporarily:
 
 ```bash
-az webapp config set --resource-group learnova-rg --name learnova-05594 --startup-file "gunicorn --bind=0.0.0.0:8000 student_management_system.wsgi:application"
-az webapp restart --resource-group learnova-rg --name learnova-05594
+az webapp config set --resource-group LEARNOVA-rg --name LEARNOVA-05594 --startup-file "gunicorn --bind=0.0.0.0:8000 student_management_system.wsgi:application"
+az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
 ```
 
 ## Cost Information
@@ -69,11 +69,11 @@ az webapp restart --resource-group learnova-rg --name learnova-05594
 
 ## Resources Created
 
-- Web App: learnova-05594
-- Storage Account: learnovastatic18774
-- App Service Plan: learnova-plan (B1 tier)
+- Web App: LEARNOVA-05594
+- Storage Account: LEARNOVAstatic18774
+- App Service Plan: LEARNOVA-plan (B1 tier)
 - Database: Uploaded to Azure Storage
 
 ## URL
 
-http://learnova-05594.azurewebsites.net (currently showing error)
+http://LEARNOVA-05594.azurewebsites.net (currently showing error)

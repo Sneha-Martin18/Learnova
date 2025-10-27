@@ -72,7 +72,7 @@
                         return result;
 
                     var uppercasedName = firstLetterToUpper(name);
-                    var eLearnovatyle = document.createElement('div')[LEXICON.s];
+                    var eLEARNOVAtyle = document.createElement('div')[LEXICON.s];
                     var resultPossibilities;
                     var i = 0;
                     var v;
@@ -87,7 +87,7 @@
                             firstLetterToUpper(currVendorWithoutDashes) + uppercasedName //WebkitTransition
                         ];
                         for (v = 0; v < resultPossibilities[LEXICON.l]; v++) {
-                            if (eLearnovatyle[resultPossibilities[v]] !== undefined) {
+                            if (eLEARNOVAtyle[resultPossibilities[v]] !== undefined) {
                                 result = resultPossibilities[v];
                                 break;
                             }
@@ -890,7 +890,7 @@
                 var base = new FakejQuery();
                 var elements = selector;
                 var i = 0;
-                var eLearnova;
+                var eLEARNOVA;
                 var el;
 
                 if (_type(selector) == TYPES.s) {
@@ -898,14 +898,14 @@
                     if (selector.charAt(0) === '<') {
                         el = document.createElement('div');
                         el.innerHTML = selector;
-                        eLearnova = el.children;
+                        eLEARNOVA = el.children;
                     }
                     else {
-                        eLearnova = document.querySelectorAll(selector);
+                        eLEARNOVA = document.querySelectorAll(selector);
                     }
 
-                    for (; i < eLearnova[LEXICON.l]; i++)
-                        elements.push(eLearnova[i]);
+                    for (; i < eLEARNOVA[LEXICON.l]; i++)
+                        elements.push(eLEARNOVA[i]);
                 }
 
                 if (elements) {

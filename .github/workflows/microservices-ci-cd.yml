@@ -275,7 +275,7 @@ jobs:
           context: ${{ matrix.service.path }}
           file: ${{ matrix.service.dockerfile }}
           push: false
-          tags: learnova-${{ matrix.service.name }}:${{ github.sha }}
+          tags: LEARNOVA-${{ matrix.service.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -284,7 +284,7 @@ jobs:
       - name: Test Docker Image
         if: steps.check_dockerfile.outputs.exists == 'true'
         run: |
-          docker images | grep learnova-${{ matrix.service.name }} || echo "Image not found"
+          docker images | grep LEARNOVA-${{ matrix.service.name }} || echo "Image not found"
           echo "✅ Successfully built ${{ matrix.service.name }} image"
 
   # Job 5: Integration Tests with Docker Compose
@@ -477,7 +477,7 @@ jobs:
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     environment:
       name: staging
-      url: https://staging.learnova.com
+      url: https://staging.LEARNOVA.com
 
     steps:
       - name: Checkout code
@@ -498,7 +498,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
-      url: https://learnova.com
+      url: https://LEARNOVA.com
 
     steps:
       - name: Checkout code

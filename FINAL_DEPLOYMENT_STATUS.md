@@ -2,7 +2,7 @@
 
 ## ✅ Deployment Complete
 
-**URL:** http://learnova-05594.azurewebsites.net
+**URL:** http://LEARNOVA-05594.azurewebsites.net
 
 **Status:** Application is deployed and running successfully
 
@@ -47,7 +47,7 @@ The application **IS WORKING** - you can:
 
 ```bash
 # SSH into the app
-az webapp ssh --resource-group learnova-rg --name learnova-05594
+az webapp ssh --resource-group LEARNOVA-rg --name LEARNOVA-05594
 
 # Once inside, run:
 cd /home/site/wwwroot
@@ -57,13 +57,13 @@ python manage.py collectstatic --noinput
 exit
 
 # Restart app
-az webapp restart --resource-group learnova-rg --name learnova-05594
+az webapp restart --resource-group LEARNOVA-rg --name LEARNOVA-05594
 ```
 
 ### Option 2: Use Azure Portal Console
 
 1. Go to https://portal.azure.com
-2. Navigate to learnova-05594
+2. Navigate to LEARNOVA-05594
 3. Click "SSH" or "Console" in left menu
 4. Run: `python manage.py collectstatic --noinput`
 5. Restart the app
@@ -77,9 +77,9 @@ The application is fully functional without CSS - all features work, just withou
 ## Technical Details
 
 ### Infrastructure
-- **Resource Group:** learnova-rg
-- **Web App:** learnova-05594
-- **App Service Plan:** learnova-plan (B1 Basic)
+- **Resource Group:** LEARNOVA-rg
+- **Web App:** LEARNOVA-05594
+- **App Service Plan:** LEARNOVA-plan (B1 Basic)
 - **Runtime:** Python 3.9
 - **Server:** Gunicorn
 - **Location:** East US

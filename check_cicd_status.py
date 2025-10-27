@@ -191,7 +191,7 @@ def main():
             print(f"\n{YELLOW}Next Step:{RESET}")
             print(f"  1. Create GitHub repository")
             print(
-                f"  2. git remote add origin https://github.com/Sneha-Martin18/Learnova.git"
+                f"  2. git remote add origin https://github.com/Sneha-Martin18/LEARNOVA.git"
             )
             print(f"  3. git push -u origin main")
             print(f"  4. Check Actions tab on GitHub")
@@ -213,7 +213,7 @@ def main():
     if not has_remote:
         print(f"  {YELLOW}1.{RESET} Connect to GitHub to activate CI/CD")
         print(
-            f"     git remote add origin https://github.com/Sneha-Martin18/Learnova.git"
+            f"     git remote add origin https://github.com/Sneha-Martin18/LEARNOVA.git"
         )
     if not all(tools.values()):
         print(f"  {YELLOW}2.{RESET} Install Python tools for local testing")
