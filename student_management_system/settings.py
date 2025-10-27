@@ -8,15 +8,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '(i#*06f#keydy_fh17bf=$0f6v)^wr^l7*u4gq42m*sztu#2_m'
+SECRET_KEY = os.environ.get('SECRET_KEY', '(i#*06f#keydy_fh17bf=$0f6v)^wr^l7*u4gq42m*sztu#2_m')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://Learnova-c3gnarhvgabjf5.centralus-01.azurewebsites.net/'
+    'https://learnova-05594.azurewebsites.net',
+    'http://learnova-05594.azurewebsites.net',
+    'https://Learnova-c3gnarhvgabjf5.centralus-01.azurewebsites.net',
 ]
 
 # Application definition
