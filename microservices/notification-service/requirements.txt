@@ -12,7 +12,7 @@ celery==5.3.4
 redis==5.0.1
 
 # Email providers
-sendgrid==6.10.0
+sendgrid==6.12.5
 
 # SMS providers  
 twilio==8.10.0
