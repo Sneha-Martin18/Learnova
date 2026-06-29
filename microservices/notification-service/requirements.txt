@@ -9,7 +9,7 @@ psycopg2-binary==2.9.7
 
 # Celery for async tasks
 celery==5.3.4
-redis==5.0.1
+redis==8.0.1
 
 # Email providers
 sendgrid==6.10.0
