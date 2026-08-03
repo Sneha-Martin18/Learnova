@@ -16,7 +16,7 @@ jobs:
     name: Clean up stale PRs
     steps:
       - name: Mark and close stale PRs
-        uses: actions/stale@v9
+        uses: actions/stale@v11
         with:
           # Stale PR settings
           stale-pr-message: |
